@@ -1,4 +1,4 @@
-// script.js — Versão completa com filtro de data padrão ajustado
+// script.js — Versão final, completa e corrigida
 
 let currentTab = 'leads';
 let currentFilters = { dataInicio: '', dataFim: '' };
@@ -8,8 +8,8 @@ let editingId = null;
 // ================== Inicialização ==================
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
-  setDefaultDates(); // Define as datas padrão ao carregar
-  switchTab('leads'); // Inicia na aba de Leads por padrão
+  setDefaultDates();
+  switchTab('leads');
 });
 
 // ================== Funções Auxiliares (Helpers) ==================
@@ -32,73 +32,70 @@ function formatCurrency(value) {
 
 // ================== Configuração de Eventos ==================
 function setupEventListeners() {
+  // Abas de navegação
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
 
+  // Filtros
   document.getElementById('applyFilterBtn')?.addEventListener('click', applyFilters);
   document.getElementById('clearFilterBtn')?.addEventListener('click', clearFilters);
+
+  // Botões de Adicionar e Exportar
   document.getElementById('addLeadBtn')?.addEventListener('click', () => openModal('lead'));
   document.getElementById('addB2cBtn')?.addEventListener('click', () => openModal('b2c'));
   document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
 
+  // Modais
   document.getElementById('leadModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('lead'); });
   document.getElementById('b2cModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('b2c'); });
-
   document.getElementById('closeLeadModal')?.addEventListener('click', () => closeModal('lead'));
   document.getElementById('closeB2cModal')?.addEventListener('click', () => closeModal('b2c'));
   document.getElementById('cancelLeadBtn')?.addEventListener('click', () => closeModal('lead'));
   document.getElementById('cancelB2cBtn')?.addEventListener('click', () => closeModal('b2c'));
 
+  // Formulários
   document.getElementById('leadForm')?.addEventListener('submit', handleLeadSubmit);
   document.getElementById('b2cForm')?.addEventListener('submit', handleB2cSubmit);
+
+  // Botões de Mostrar/Esconder Tabelas
+  document.getElementById('toggleLeadsBtn')?.addEventListener('click', () => {
+    const container = document.getElementById('leadsTableContainer');
+    if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('toggleB2cBtn')?.addEventListener('click', () => {
+    const container = document.getElementById('b2cTableContainer');
+    if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
+  });
 }
 
 // ================== Navegação e Filtros ==================
 function switchTab(tabName) {
   if (!tabName) return;
   currentTab = tabName;
-
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.tab === tabName);
   });
-
   document.getElementById('leads-content').style.display = (tabName === 'leads') ? 'grid' : 'none';
   document.getElementById('b2c-content').style.display = (tabName === 'b2c') ? 'grid' : 'none';
-
   loadData();
 }
 
-// ESTA É A FUNÇÃO ATUALIZADA
 function setDefaultDates() {
-  // A data final será sempre o dia de hoje.
   const today = new Date(); 
-  
-  // A data de início será sempre 1º de janeiro de 2025.
-  // O '0' no mês representa Janeiro.
   const firstDayOfYear = new Date(2025, 0, 1); 
-
   const inicioInput = document.getElementById('dataInicio');
   const fimInput = document.getElementById('dataFim');
-  
-  // Define os valores nos campos do formulário, se estiverem vazios.
-  if (inicioInput && !inicioInput.value) {
-    inicioInput.value = formatDate(firstDayOfYear);
-  }
-  if (fimInput && !fimInput.value) {
-    fimInput.value = formatDate(today);
-  }
-  
-  // Atualiza os filtros que o script usa para fazer as chamadas à API.
+  if (inicioInput && !inicioInput.value) inicioInput.value = formatDate(firstDayOfYear);
+  if (fimInput && !fimInput.value) fimInput.value = formatDate(today);
   currentFilters.dataInicio = inicioInput?.value || '';
   currentFilters.dataFim = fimInput?.value || '';
 }
 
-
 function applyFilters() {
   const dataInicio = document.getElementById('dataInicio').value;
   const dataFim = document.getElementById('dataFim').value;
-
   if (dataInicio && dataFim && dataInicio > dataFim) {
     showToast('Data de início não pode ser maior que a data de fim.', 'error');
     return;
@@ -112,7 +109,7 @@ function applyFilters() {
 function clearFilters() {
   document.getElementById('dataInicio').value = '';
   document.getElementById('dataFim').value = '';
-  setDefaultDates(); // Volta para as datas padrão (agora 01/01/2025 até hoje)
+  setDefaultDates();
   loadData();
   showToast('Filtros limpos.', 'info');
 }
@@ -121,11 +118,8 @@ function clearFilters() {
 async function loadData() {
   showLoading(true);
   try {
-    if (currentTab === 'leads') {
-      await loadLeadsData();
-    } else {
-      await loadB2cData();
-    }
+    if (currentTab === 'leads') await loadLeadsData();
+    else await loadB2cData();
   } catch (err) {
     console.error('Erro ao carregar dados:', err);
     showToast('Falha ao carregar dados. Verifique o console.', 'error');
@@ -135,33 +129,23 @@ async function loadData() {
 }
 
 async function loadLeadsData() {
-  const params = new URLSearchParams({
-    data_inicio: currentFilters.dataInicio,
-    data_fim: currentFilters.dataFim
-  });
+  const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
   const resp = await fetch(`/api/leads?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados de Leads');
   const leads = await resp.json();
-
   const metrics = calculateLeadsMetrics(leads);
   const dailyMetrics = calculateDailyLeadsMetrics(leads);
-
   updateLeadsMetrics(metrics);
   updateLeadsTable(leads || []);
   updateLeadsCharts(dailyMetrics);
 }
 
 async function loadB2cData() {
-  const params = new URLSearchParams({
-    data_inicio: currentFilters.dataInicio,
-    data_fim: currentFilters.dataFim
-  });
+  const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
   const resp = await fetch(`/api/b2c?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados B2C');
   const data = await resp.json();
-
   const metrics = calculateB2cMetrics(data);
-
   updateB2cMetrics(metrics);
   updateB2cTable(data || []);
   updateB2cCharts(data || [], metrics);
@@ -169,17 +153,8 @@ async function loadB2cData() {
 
 // ================== Cálculo de Métricas ==================
 function calculateLeadsMetrics(leads) {
-  const metrics = {
-    totalLeads: 0,
-    leadsAskSuite: 0,
-    leadsFilaAtendimento: 0,
-    leadsAtendimento: 0,
-    leadsQualificacao: 0,
-    leadsOportunidade: 0,
-    leadsAguardandoPagamento: 0,
-  };
+  const metrics = { totalLeads: 0, leadsAskSuite: 0, leadsFilaAtendimento: 0, leadsAtendimento: 0, leadsQualificacao: 0, leadsOportunidade: 0, leadsAguardandoPagamento: 0 };
   if (!Array.isArray(leads)) return metrics;
-  
   leads.forEach(lead => {
     metrics.totalLeads++;
     metrics.leadsAskSuite += Number(lead.entrada_leads_ask_suite) || 0;
@@ -197,9 +172,7 @@ function calculateDailyLeadsMetrics(leads) {
     (leads || []).forEach(lead => {
       const date = lead.data_entrada;
       if (!date) return;
-      if (!dailyData[date]) {
-        dailyData[date] = { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 };
-      }
+      if (!dailyData[date]) { dailyData[date] = { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 }; }
       dailyData[date].askSuite += Number(lead.entrada_leads_ask_suite) || 0;
       dailyData[date].filaAtendimento += Number(lead.fila_atendimento) || 0;
       dailyData[date].atendimento += Number(lead.atendimento) || 0;
@@ -216,49 +189,29 @@ function calculateDailyLeadsMetrics(leads) {
       totals.oportunidade += dayData.oportunidade;
       totals.aguardandoPagamento += dayData.aguardandoPagamento;
     });
-    return {
-      ...totals,
-      dailyData,
-      totalDays: Object.keys(dailyData).length || 1,
-    };
+    return { ...totals, dailyData, totalDays: Object.keys(dailyData).length || 1 };
 }
 
 function calculateB2cMetrics(data) {
-  const metrics = {
-    total_registros: 0,
-    total_valor: 0,
-    total_confirmados: 0,
-    total_pendentes: 0,
-    total_cancelados: 0,
-    hoteis_stats: {},
-    status_pagamento_stats: {},
-  };
+  const metrics = { total_registros: 0, total_valor: 0, total_confirmados: 0, total_pendentes: 0, total_cancelados: 0, hoteis_stats: {}, status_pagamento_stats: {} };
   if (!Array.isArray(data)) return metrics;
-
   data.forEach(item => {
     metrics.total_registros++;
     metrics.total_valor += Number(item.valor) || 0;
-
     const status = item.status || 'PENDENTE';
     if (status === 'CONFIRMADO') metrics.total_confirmados++;
     else if (status === 'CANCELADO') metrics.total_cancelados++;
     else metrics.total_pendentes++;
-
     const statusPag = item.status_pagamento || 'NÃO INFORMADO';
     metrics.status_pagamento_stats[statusPag] = (metrics.status_pagamento_stats[statusPag] || 0) + 1;
-
     if (item.nome_hotel) {
-      if (!metrics.hoteis_stats[item.nome_hotel]) {
-        metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 };
-      }
+      if (!metrics.hoteis_stats[item.nome_hotel]) { metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; }
       metrics.hoteis_stats[item.nome_hotel].valor_total += Number(item.valor) || 0;
       metrics.hoteis_stats[item.nome_hotel].quantidade++;
     }
   });
-
   metrics.hoteis_mais_vendidos = Object.values(metrics.hoteis_stats);
   metrics.status_pagamento = Object.entries(metrics.status_pagamento_stats).map(([status, qtd]) => ({ status_pagamento: status, quantidade: qtd }));
-  
   return metrics;
 }
 
@@ -339,158 +292,82 @@ function delegatedClickHandler(e) {
   const btn = e.currentTarget;
   const id = btn.dataset.id;
   const action = btn.dataset.action;
-  
   if (!action || !id) return;
-
   const actions = {
     'edit-lead': () => editLead(id),
     'delete-lead': () => deleteLead(id),
     'edit-b2c': () => editB2c(id),
     'delete-b2c': () => deleteB2c(id),
   };
-
-  if (actions[action]) {
-    actions[action]();
-  }
+  if (actions[action]) { actions[action](); }
 }
 
 // ================== Gráficos (Chart.js) ==================
 function updateLeadsCharts(dailyMetrics) {
     const ctx = document.getElementById('leadsFunnelChart');
     if (!ctx) return;
-  
     if (charts.leadsFunnel) charts.leadsFunnel.destroy();
-  
     const days = Object.keys(dailyMetrics.dailyData || {});
     const lastDay = days.length > 0 ? days[days.length - 1] : null;
-    const dataDay = lastDay ? dailyMetrics.dailyData[lastDay] : {
-      askSuite: 0, filaAtendimento: 0, atendimento: 0,
-      qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0
-    };
-  
+    const dataDay = lastDay ? dailyMetrics.dailyData[lastDay] : { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 };
     const funnelLabels = ['Ask Suite', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
-    const funnelValues = [
-      dataDay.askSuite, dataDay.filaAtendimento, dataDay.atendimento,
-      dataDay.qualificacao, dataDay.oportunidade, dataDay.aguardandoPagamento
-    ];
-  
+    const funnelValues = [ dataDay.askSuite, dataDay.filaAtendimento, dataDay.atendimento, dataDay.qualificacao, dataDay.oportunidade, dataDay.aguardandoPagamento ];
     charts.leadsFunnel = new Chart(ctx.getContext('2d'), {
       type: 'bar',
       data: {
         labels: funnelLabels,
-        datasets: [{
-          label: lastDay ? `Leads do dia ${formatDateBR(lastDay)}` : 'Nenhum dado no período',
-          data: funnelValues,
-          backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'],
-          borderRadius: 5,
-        }],
+        datasets: [{ label: lastDay ? `Leads do dia ${formatDateBR(lastDay)}` : 'Nenhum dado no período', data: funnelValues, backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'], borderRadius: 5 }],
       },
       options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: 'Funil de Leads (Dia Mais Recente)', font: { size: 16 }, padding: 15 },
-          tooltip: { callbacks: { label: (c) => `${c.label}: ${c.parsed.x} leads` } },
-        },
-        scales: {
-          x: { beginAtZero: true, title: { display: true, text: 'Quantidade' } },
-          y: { grid: { display: false } }
-        }
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, title: { display: true, text: 'Funil de Leads (Dia Mais Recente)', font: { size: 16 }, padding: 15 }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.parsed.x} leads` } } },
+        scales: { x: { beginAtZero: true, title: { display: true, text: 'Quantidade' } }, y: { grid: { display: false } } }
       }
     });
 }
 
 function updateB2cCharts(b2cData, metrics) {
-    // Top 5 Hotéis por Valor
     const topHoteisValorCanvas = document.getElementById("topHoteisChart");
     if (topHoteisValorCanvas && metrics.hoteis_mais_vendidos) {
         if (charts.topHoteisValor) charts.topHoteisValor.destroy();
         const topHoteisValor = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.valor_total - a.valor_total).slice(0, 5);
         charts.topHoteisValor = new Chart(topHoteisValorCanvas.getContext("2d"), {
-            type: "doughnut",
-            data: {
-                labels: topHoteisValor.map(h => h.nome_hotel || "N/A"),
-                datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }]
-            },
+            type: "doughnut", data: { labels: topHoteisValor.map(h => h.nome_hotel || "N/A"), datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
         });
     }
-
-    // Status dos Registros
     const statusCanvas = document.getElementById("statusChart");
     if (statusCanvas) {
         if (charts.status) charts.status.destroy();
         charts.status = new Chart(statusCanvas.getContext("2d"), {
-            type: "pie",
-            data: {
-                labels: ["Confirmados", "Pendentes", "Cancelados"],
-                datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"] }]
-            },
+            type: "pie", data: { labels: ["Confirmados", "Pendentes", "Cancelados"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"] }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
         });
     }
-
-    // Status de Pagamento
     const statusPagamentoCanvas = document.getElementById("statusPagamentoChart");
     if (statusPagamentoCanvas && metrics.status_pagamento) {
         if (charts.statusPagamento) charts.statusPagamento.destroy();
         charts.statusPagamento = new Chart(statusPagamentoCanvas.getContext("2d"), {
-            type: "bar",
-            data: { 
-                labels: metrics.status_pagamento.map(s => s.status_pagamento), 
-                datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }] 
-            },
+            type: "bar", data: { labels: metrics.status_pagamento.map(s => s.status_pagamento), datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }] },
             options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } },
         });
     }
-
-    // Vendas por Data (Timeline)
     const vendasCanvas = document.getElementById("vendasTimelineChart");
     if (vendasCanvas) {
         if (charts.vendasTimeline) charts.vendasTimeline.destroy();
         const vendasData = processTimelineData(b2cData, "data", "valor");
         charts.vendasTimeline = new Chart(vendasCanvas.getContext("2d"), {
-            type: "line",
-            data: {
-                labels: vendasData.labels,
-                datasets: [{
-                    label: "Vendas (R$)",
-                    data: vendasData.data,
-                    borderColor: "#4facfe",
-                    backgroundColor: "rgba(79, 172, 254, 0.1)",
-                    fill: true,
-                    tension: 0.4,
-                }],
-            },
+            type: "line", data: { labels: vendasData.labels, datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }] },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } } },
         });
     }
-
-    // Top 5 Hotéis por Quantidade Vendida
     const topHoteisQtdCanvas = document.getElementById("topHoteisQtdChart");
     if (topHoteisQtdCanvas && metrics.hoteis_mais_vendidos) {
         if (charts.topHoteisQtd) charts.topHoteisQtd.destroy();
         const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
         charts.topHoteisQtd = new Chart(topHoteisQtdCanvas.getContext("2d"), {
-            type: "bar",
-            data: {
-                labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"),
-                datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { callbacks: { label: (ctx) => `${ctx.raw} vendas` } }
-                },
-                scales: {
-                    y: { beginAtZero: true, title: { display: true, text: "Vendas" } },
-                    x: { title: { display: true, text: "Hotéis" } }
-                }
-            }
+            type: "bar", data: { labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"), datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} vendas` } } }, scales: { y: { beginAtZero: true, title: { display: true, text: "Vendas" } }, x: { title: { display: true, text: "Hotéis" } } } }
         });
     }
 }
@@ -505,10 +382,7 @@ function processTimelineData(data, dateField, valueField = null) {
     grouped[dateStr] += valueField ? (Number(item[valueField]) || 0) : 1;
   });
   const sortedDates = Object.keys(grouped).sort((a, b) => new Date(a) - new Date(b));
-  return { 
-    labels: sortedDates.map(date => formatDateBR(date)), 
-    data: sortedDates.map(date => grouped[date]) 
-  };
+  return { labels: sortedDates.map(date => formatDateBR(date)), data: sortedDates.map(date => grouped[date]) };
 }
 
 // ================== Modais (Adicionar/Editar) ==================
@@ -517,11 +391,9 @@ function openModal(type, data = null) {
   const modalId = `${type}Modal`;
   const modal = document.getElementById(modalId);
   if (!modal) return;
-
   document.getElementById(`${type}ModalTitle`).textContent = data ? `Editar ${type.toUpperCase()}` : `Adicionar ${type.toUpperCase()}`;
   const form = document.getElementById(`${type}Form`);
   form.reset();
-
   if (type === 'lead') {
     if (data) {
       form.data_entrada.value = formatDate(data.data_entrada);
@@ -557,7 +429,16 @@ function closeModal(type) {
 // ================== Operações CRUD (Salvar, Editar, Deletar) ==================
 async function handleLeadSubmit(e) {
   e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target).entries());
+  const formData = new FormData(e.target);
+  const data = {
+    data_entrada: formData.get('data_entrada'),
+    entrada_leads_ask_suite: parseInt(formData.get('entrada_leads_ask_suite'), 10) || 0,
+    fila_atendimento: parseInt(formData.get('fila_atendimento'), 10) || 0,
+    atendimento: parseInt(formData.get('atendimento'), 10) || 0,
+    qualificacao: parseInt(formData.get('qualificacao'), 10) || 0,
+    oportunidade: parseInt(formData.get('oportunidade'), 10) || 0,
+    aguardando_pagamento: parseInt(formData.get('aguardando_pagamento'), 10) || 0,
+  };
   await saveData('lead', data, editingId);
 }
 
@@ -575,8 +456,10 @@ async function handleB2cSubmit(e) {
 }
 
 async function saveData(type, data, id) {
-  const url = id ? `/api/${type}/${id}` : `/api/${type}`;
+  const endpoint = type === 'lead' ? 'leads' : 'b2c';
+  const url = id ? `/api/${endpoint}/${id}` : `/api/${endpoint}`;
   const method = id ? 'PUT' : 'POST';
+  
   showLoading(true);
   try {
     const resp = await fetch(url, {
@@ -585,8 +468,8 @@ async function saveData(type, data, id) {
       body: JSON.stringify(data)
     });
     if (!resp.ok) {
-      const errData = await resp.json().catch(() => ({ error: `Erro desconhecido ao salvar ${type}` }));
-      throw new Error(errData.error);
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error || `Erro ${resp.status} ao salvar.`);
     }
     closeModal(type);
     loadData();
@@ -651,11 +534,7 @@ async function deleteItem(type, id) {
 async function exportToPDF() {
   showLoading(true);
   try {
-    const params = new URLSearchParams({
-        data_inicio: currentFilters.dataInicio,
-        data_fim: currentFilters.dataFim,
-        tipo: currentTab
-    });
+    const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim, tipo: currentTab });
     const resp = await fetch(`/api/export/pdf?${params}`);
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
@@ -703,7 +582,16 @@ function showToast(message, type = 'info') {
   container.appendChild(toast);
   
   setTimeout(() => {
+    toast.classList.add('show');
+  }, 100);
+
+  setTimeout(() => {
+    toast.classList.remove('show');
     toast.classList.add('hide');
-    toast.addEventListener('transitionend', () => toast.remove());
+    
+    toast.addEventListener('transitionend', () => {
+      toast.remove();
+    }, { once: true });
+
   }, 5000);
 }
