@@ -192,28 +192,57 @@ function calculateDailyLeadsMetrics(leads) {
     return { ...totals, dailyData, totalDays: Object.keys(dailyData).length || 1 };
 }
 
+// ====================================================================
+//   SUBSTITUA A FUNÇÃO 'calculateB2cMetrics' INTEIRA POR ESTA VERSÃO
+// ====================================================================
+
 function calculateB2cMetrics(data) {
-  const metrics = { total_registros: 0, total_valor: 0, total_confirmados: 0, total_pendentes: 0, total_cancelados: 0, hoteis_stats: {}, status_pagamento_stats: {} };
+  const metrics = { 
+    total_registros: 0, 
+    total_valor: 0, 
+    total_confirmados: 0, 
+    total_pendentes: 0, 
+    total_cancelados: 0, 
+    hoteis_stats: {}, 
+    status_pagamento_stats: {} 
+  };
+
   if (!Array.isArray(data)) return metrics;
+
   data.forEach(item => {
     metrics.total_registros++;
     metrics.total_valor += Number(item.valor) || 0;
-    const status = item.status || 'PENDENTE';
-    if (status === 'CONFIRMADO') metrics.total_confirmados++;
-    else if (status === 'CANCELADO') metrics.total_cancelados++;
-    else metrics.total_pendentes++;
+
+    // **CORREÇÃO FINAL E ROBUSTA: Converte o status para minúsculas antes de comparar**
+    // Isso garante que "Confirmado", "confirmado", "CONFIRMADO", etc., sejam tratados da mesma forma.
+    const status = (item.status || 'pendente').toLowerCase(); // Converte para minúsculas
+
+    if (status === 'confirmado' || status === 'ativo') {
+      metrics.total_confirmados++;
+    } else if (status === 'cancelado') {
+      metrics.total_cancelados++;
+    } else if (status === 'pendente') {
+      metrics.total_pendentes++;
+    }
+
     const statusPag = item.status_pagamento || 'NÃO INFORMADO';
     metrics.status_pagamento_stats[statusPag] = (metrics.status_pagamento_stats[statusPag] || 0) + 1;
+
     if (item.nome_hotel) {
-      if (!metrics.hoteis_stats[item.nome_hotel]) { metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; }
+      if (!metrics.hoteis_stats[item.nome_hotel]) { 
+        metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; 
+      }
       metrics.hoteis_stats[item.nome_hotel].valor_total += Number(item.valor) || 0;
       metrics.hoteis_stats[item.nome_hotel].quantidade++;
     }
   });
+
   metrics.hoteis_mais_vendidos = Object.values(metrics.hoteis_stats);
   metrics.status_pagamento = Object.entries(metrics.status_pagamento_stats).map(([status, qtd]) => ({ status_pagamento: status, quantidade: qtd }));
+  
   return metrics;
 }
+
 
 // ================== Atualização da UI (Métricas e Tabelas) ==================
 function updateLeadsMetrics(metrics) {
@@ -327,49 +356,72 @@ function updateLeadsCharts(dailyMetrics) {
 }
 
 function updateB2cCharts(b2cData, metrics) {
-    const topHoteisValorCanvas = document.getElementById("topHoteisChart");
-    if (topHoteisValorCanvas && metrics.hoteis_mais_vendidos) {
-        if (charts.topHoteisValor) charts.topHoteisValor.destroy();
-        const topHoteisValor = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.valor_total - a.valor_total).slice(0, 5);
-        charts.topHoteisValor = new Chart(topHoteisValorCanvas.getContext("2d"), {
-            type: "doughnut", data: { labels: topHoteisValor.map(h => h.nome_hotel || "N/A"), datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
-        });
+    // Função auxiliar para criar ou atualizar um gráfico
+    function createOrUpdateChart(chartId, chartConfig) {
+        const canvas = document.getElementById(chartId);
+        if (!canvas) return;
+        if (charts[chartId]) {
+            charts[chartId].destroy();
+        }
+        charts[chartId] = new Chart(canvas.getContext("2d"), chartConfig);
     }
-    const statusCanvas = document.getElementById("statusChart");
-    if (statusCanvas) {
-        if (charts.status) charts.status.destroy();
-        charts.status = new Chart(statusCanvas.getContext("2d"), {
-            type: "pie", data: { labels: ["Confirmados", "Pendentes", "Cancelados"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"] }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
-        });
-    }
-    const statusPagamentoCanvas = document.getElementById("statusPagamentoChart");
-    if (statusPagamentoCanvas && metrics.status_pagamento) {
-        if (charts.statusPagamento) charts.statusPagamento.destroy();
-        charts.statusPagamento = new Chart(statusPagamentoCanvas.getContext("2d"), {
-            type: "bar", data: { labels: metrics.status_pagamento.map(s => s.status_pagamento), datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }] },
-            options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } },
-        });
-    }
-    const vendasCanvas = document.getElementById("vendasTimelineChart");
-    if (vendasCanvas) {
-        if (charts.vendasTimeline) charts.vendasTimeline.destroy();
-        const vendasData = processTimelineData(b2cData, "data", "valor");
-        charts.vendasTimeline = new Chart(vendasCanvas.getContext("2d"), {
-            type: "line", data: { labels: vendasData.labels, datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } } },
-        });
-    }
-    const topHoteisQtdCanvas = document.getElementById("topHoteisQtdChart");
-    if (topHoteisQtdCanvas && metrics.hoteis_mais_vendidos) {
-        if (charts.topHoteisQtd) charts.topHoteisQtd.destroy();
-        const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
-        charts.topHoteisQtd = new Chart(topHoteisQtdCanvas.getContext("2d"), {
-            type: "bar", data: { labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"), datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} vendas` } } }, scales: { y: { beginAtZero: true, title: { display: true, text: "Vendas" } }, x: { title: { display: true, text: "Hotéis" } } } }
-        });
-    }
+
+    // --- Gráfico 1: Top 5 Hotéis por Valor (Doughnut) ---
+    const topHoteisValor = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.valor_total - a.valor_total).slice(0, 5);
+    createOrUpdateChart('topHoteisChart', {
+        type: "doughnut",
+        data: {
+            labels: topHoteisValor.map(h => h.nome_hotel || "N/A"),
+            datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
+    });
+
+    // --- Gráfico 2: Status dos Registros (Pie) ---
+    createOrUpdateChart('statusChart', {
+        type: "pie",
+        data: {
+            labels: ["Confirmados", "Pendentes", "Cancelados"],
+            datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"], borderColor: '#ffffff', borderWidth: 2 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
+    });
+
+    // --- Gráfico 3: Status de Pagamento (Bar) ---
+    createOrUpdateChart('statusPagamentoChart', {
+        type: "bar",
+        data: {
+            labels: metrics.status_pagamento.map(s => s.status_pagamento),
+            datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
+    });
+
+    // --- Gráfico 4: Vendas por Data (Line) ---
+    const vendasData = processTimelineData(b2cData, "data", "valor");
+    createOrUpdateChart('vendasTimelineChart', {
+        type: "line",
+        data: {
+            labels: vendasData.labels,
+            datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } } }
+    });
+
+    // --- Gráfico 5: Top 5 Hotéis por Quantidade (Bar) ---
+    const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
+    createOrUpdateChart('topHoteisQtdChart', {
+        type: "bar",
+        data: {
+            labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"),
+            datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} vendas` } } },
+            scales: { y: { beginAtZero: true, title: { display: true, text: "Vendas" } }, x: { title: { display: true, text: "Hotéis" } } }
+        }
+    });
 }
 
 // ================== Processamento de Dados para Gráficos ==================
