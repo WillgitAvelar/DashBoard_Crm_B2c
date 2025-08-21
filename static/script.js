@@ -339,7 +339,7 @@ function updateLeadsCharts(dailyMetrics) {
     const days = Object.keys(dailyMetrics.dailyData || {});
     const lastDay = days.length > 0 ? days[days.length - 1] : null;
     const dataDay = lastDay ? dailyMetrics.dailyData[lastDay] : { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 };
-    const funnelLabels = ['Ask Suite', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
+    const funnelLabels = ['Entrada de Leads', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
     const funnelValues = [ dataDay.askSuite, dataDay.filaAtendimento, dataDay.atendimento, dataDay.qualificacao, dataDay.oportunidade, dataDay.aguardandoPagamento ];
     charts.leadsFunnel = new Chart(ctx.getContext('2d'), {
       type: 'bar',
