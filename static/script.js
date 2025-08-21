@@ -398,15 +398,71 @@ function updateB2cCharts(b2cData, metrics) {
     });
 
     // --- Gráfico 4: Vendas por Data (Line) ---
+// ====================================================================
+//   DENTRO DA FUNÇÃO 'updateB2cCharts', SUBSTITUA ESTE BLOCO
+// ====================================================================
+
+// Bloco de código ANTIGO a ser substituído:
+/*
+    // --- Gráfico 4: Vendas por Data (Line ) ---
     const vendasData = processTimelineData(b2cData, "data", "valor");
     createOrUpdateChart('vendasTimelineChart', {
         type: "line",
-        data: {
-            labels: vendasData.labels,
-            datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } } }
+        data: { ... },
+        options: { ... }
     });
+*/
+
+// Bloco de código NOVO e CORRIGIDO:
+// --- Gráfico 4: Vendas por Data (Line) ---
+const vendasData = processTimelineData(b2cData, "data", "valor");
+createOrUpdateChart('vendasTimelineChart', {
+    type: "line",
+    data: {
+        labels: vendasData.labels,
+        datasets: [{
+            label: "Vendas (R$)",
+            data: vendasData.data,
+            borderColor: "#4facfe",
+            backgroundColor: "rgba(79, 172, 254, 0.1)",
+            fill: true,
+            tension: 0.4,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: (v) => formatCurrency(v)
+                }
+            }
+        },
+        // **INÍCIO DA CONFIGURAÇÃO DO PLUGIN DE ZOOM E ROLAGEM**
+        plugins: {
+            zoom: {
+                pan: {
+                    enabled: true, // Habilita a rolagem (arrastar)
+                    mode: 'x',     // Permite rolar apenas no eixo X (horizontal)
+                    modifierKey: 'ctrl', // Opcional: Segure CTRL para rolar
+                },
+                zoom: {
+                    wheel: {
+                        enabled: true, // Habilita o zoom com a roda do mouse
+                    },
+                    pinch: {
+                        enabled: true // Habilita o zoom com gesto de pinça (para telas sensíveis ao toque)
+                    },
+                    mode: 'x', // Permite dar zoom apenas no eixo X
+                }
+            }
+        }
+        // **FIM DA CONFIGURAÇÃO DO PLUGIN**
+    }
+});
+
 
     // --- Gráfico 5: Top 5 Hotéis por Quantidade (Bar) ---
     const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
@@ -647,3 +703,70 @@ function showToast(message, type = 'info') {
 
   }, 5000);
 }
+// ====================================================================
+//          COLE ESTE BLOCO NO FINAL DO SEU SCRIPT.JS
+// ====================================================================
+
+// Lógica para o Zoom dos Gráficos
+document.addEventListener('DOMContentLoaded', () => {
+    const chartZoomModal = document.getElementById('chartZoomModal');
+    const chartZoomContainer = document.getElementById('chartZoomContainer');
+    const chartZoomTitle = document.getElementById('chartZoomTitle');
+    const closeBtn = document.getElementById('closeChartZoomModal');
+
+    // Fecha o modal ao clicar no botão 'X'
+    closeBtn?.addEventListener('click', () => {
+        chartZoomModal.classList.remove('active');
+        // Destrói o gráfico clonado para liberar memória
+        if (charts.zoomChart) {
+            charts.zoomChart.destroy();
+        }
+    });
+
+    // Fecha o modal ao clicar fora do conteúdo
+    chartZoomModal?.addEventListener('click', (e) => {
+        if (e.target === chartZoomModal) {
+            chartZoomModal.classList.remove('active');
+            if (charts.zoomChart) {
+                charts.zoomChart.destroy();
+            }
+        }
+    });
+
+    // Adiciona o evento de clique a todos os contêineres de gráfico
+    document.querySelectorAll('.chart-container').forEach(container => {
+        container.addEventListener('click', () => {
+            const originalCanvas = container.querySelector('canvas');
+            const chartId = originalCanvas.id;
+            const chartTitle = container.querySelector('h3')?.innerText || 'Gráfico';
+
+            // Pega a configuração do gráfico original
+            const originalChart = charts[chartId.replace('Chart', '')] || charts[chartId];
+            if (!originalChart) {
+                console.error("Configuração do gráfico original não encontrada:", chartId);
+                return;
+            }
+
+            // Limpa o contêiner do zoom e cria um novo canvas
+            chartZoomContainer.innerHTML = '<canvas id="zoomCanvas"></canvas>';
+            const zoomCanvas = document.getElementById('zoomCanvas');
+            
+            // Atualiza o título do modal
+            chartZoomTitle.innerText = chartTitle;
+
+            // Clona o gráfico no modal
+            charts.zoomChart = new Chart(zoomCanvas.getContext('2d'), {
+                type: originalChart.config.type,
+                data: originalChart.config.data,
+                options: {
+                    ...originalChart.config.options, // Copia as opções originais
+                    maintainAspectRatio: false, // Permite que o gráfico preencha o contêiner
+                    responsive: true
+                }
+            });
+
+            // Mostra o modal
+            chartZoomModal.classList.add('active');
+        });
+    });
+});

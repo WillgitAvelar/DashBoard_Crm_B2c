@@ -665,3 +665,63 @@ form {
   background: #1e88e5;
 }
 
+/* =================================== */
+/*      ESTILOS PARA GRÁFICOS         */
+/* =================================== */
+
+/* Garante que o grid de gráficos possa ter itens de tamanhos diferentes */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    align-items: start; /* Alinha os itens no topo */
+}
+
+/* Faz o contêiner do gráfico ocupar duas colunas do grid */
+.chart-container-large {
+    grid-column: span 2; /* A MÁGICA ACONTECE AQUI */
+}
+
+/* Ajuste para telas menores (celulares, etc.) */
+@media (max-width: 768px) {
+    .chart-container-large {
+        grid-column: span 1; /* Em telas pequenas, volta a ocupar uma coluna */
+    }
+}
+/* =================================== */
+/*      ESTILOS PARA ZOOM DO GRÁFICO     */
+/* =================================== */
+
+/* Permite que o conteúdo do modal seja maior */
+.modal-content-large {
+    max-width: 90vw;
+    width: 80%;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Contêiner onde o gráfico ampliado ficará */
+.chart-zoom-container {
+    flex-grow: 1; /* Ocupa todo o espaço vertical disponível */
+    position: relative; /* Necessário para o Chart.js se ajustar */
+    padding: 20px;
+}
+
+/* Adiciona um cursor de ponteiro para indicar que os gráficos são clicáveis */
+.chart-container canvas {
+    cursor: pointer;
+}
+/* ======================================================= */
+/*   CSS PARA INDICAR INTERATIVIDADE NO GRÁFICO DE LINHA   */
+/* ======================================================= */
+
+/* Muda o cursor para "agarrar", indicando que é rolável */
+#vendasTimelineChart {
+    cursor: grab;
+}
+
+/* Muda o cursor para "agarrando" quando o usuário clica e arrasta */
+#vendasTimelineChart:active {
+    cursor: grabbing;
+}

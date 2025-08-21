@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -151,7 +154,7 @@
                     <div class="chart-container"><h3>Top 5 Hotéis Mais Vendidos por Valor</h3><canvas id="topHoteisChart"></canvas></div>
                     <div class="chart-container"><h3>Status dos Registros</h3><canvas id="statusChart"></canvas></div>
                     <div class="chart-container"><h3>Status de Pagamento</h3><canvas id="statusPagamentoChart"></canvas></div>
-                    <div class="chart-container"><h3>Vendas por Data</h3><canvas id="vendasTimelineChart"></canvas></div>
+                    <div class="chart-container chart-container-large"><h3>Vendas por Data</h3><canvas id="vendasTimelineChart"></canvas></div>
                     <div class="chart-container"><h3>Top 5 Hotéis por Quantidade Vendida</h3><canvas id="topHoteisQtdChart"></canvas></div>
                 </div>
 
@@ -230,6 +233,21 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <!-- =================================== -->
+<!--      MODAL PARA ZOOM DO GRÁFICO     -->
+<!-- =================================== -->
+<div class="modal" id="chartZoomModal">
+    <div class="modal-content modal-content-large">
+        <div class="modal-header">
+            <h3 id="chartZoomTitle">Visualização do Gráfico</h3>
+            <button class="modal-close" id="closeChartZoomModal"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chart-zoom-container" id="chartZoomContainer">
+            <!-- O gráfico ampliado será inserido aqui pelo JavaScript -->
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
