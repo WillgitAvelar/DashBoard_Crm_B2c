@@ -725,3 +725,35 @@ form {
 #vendasTimelineChart:active {
     cursor: grabbing;
 }
+/* =================================== */
+/*   ESTILOS PARA O FILTRO DE HOTEL    */
+/* =================================== */
+
+.hotel-filter-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
+}
+
+.hotel-filter-container .filter-group {
+    flex-grow: 1; /* Faz o grupo do input ocupar o máximo de espaço */
+}
+
+.text-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+/* Esconde o gráfico específico do hotel por padrão */
+#hotelSpecificChartContainer {
+    margin-top: 20px;
+}

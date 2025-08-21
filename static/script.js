@@ -1,15 +1,18 @@
-// script.js — Versão final, completa e corrigida
+// ===================================================================
+//   SCRIPT.JS - VERSÃO FINAL COMPLETA E ESTRUTURADA
+// ===================================================================
 
 let currentTab = 'leads';
 let currentFilters = { dataInicio: '', dataFim: '' };
 let charts = {};
 let editingId = null;
+let allB2cData = []; // Armazena todos os dados B2C para filtragem no front-end
 
-// ================== Inicialização ==================
+// ================== Inicialização Principal ==================
 document.addEventListener('DOMContentLoaded', () => {
-  setupEventListeners();
-  setDefaultDates();
-  switchTab('leads');
+  setupEventListeners(); // Configura TODOS os eventos da página
+  setDefaultDates();     // Define as datas padrão do filtro
+  switchTab('leads');      // Carrega a primeira aba
 });
 
 // ================== Funções Auxiliares (Helpers) ==================
@@ -30,23 +33,21 @@ function formatCurrency(value) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 }
 
-// ================== Configuração de Eventos ==================
+// ================== Configuração Centralizada de Eventos ==================
 function setupEventListeners() {
-  // Abas de navegação
+  // --- Eventos de Navegação e Filtros ---
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
-
-  // Filtros
   document.getElementById('applyFilterBtn')?.addEventListener('click', applyFilters);
   document.getElementById('clearFilterBtn')?.addEventListener('click', clearFilters);
 
-  // Botões de Adicionar e Exportar
+  // --- Botões Principais (Adicionar, Exportar) ---
   document.getElementById('addLeadBtn')?.addEventListener('click', () => openModal('lead'));
   document.getElementById('addB2cBtn')?.addEventListener('click', () => openModal('b2c'));
   document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
 
-  // Modais
+  // --- Eventos dos Modais ---
   document.getElementById('leadModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('lead'); });
   document.getElementById('b2cModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('b2c'); });
   document.getElementById('closeLeadModal')?.addEventListener('click', () => closeModal('lead'));
@@ -54,19 +55,77 @@ function setupEventListeners() {
   document.getElementById('cancelLeadBtn')?.addEventListener('click', () => closeModal('lead'));
   document.getElementById('cancelB2cBtn')?.addEventListener('click', () => closeModal('b2c'));
 
-  // Formulários
+  // --- Eventos dos Formulários ---
   document.getElementById('leadForm')?.addEventListener('submit', handleLeadSubmit);
   document.getElementById('b2cForm')?.addEventListener('submit', handleB2cSubmit);
 
-  // Botões de Mostrar/Esconder Tabelas
+  // --- Botões de Mostrar/Esconder Tabelas ---
   document.getElementById('toggleLeadsBtn')?.addEventListener('click', () => {
     const container = document.getElementById('leadsTableContainer');
     if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
   });
-
   document.getElementById('toggleB2cBtn')?.addEventListener('click', () => {
     const container = document.getElementById('b2cTableContainer');
     if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // --- Lógica do Zoom dos Gráficos ---
+  const chartZoomModal = document.getElementById('chartZoomModal');
+  const chartZoomContainer = document.getElementById('chartZoomContainer');
+  const chartZoomTitle = document.getElementById('chartZoomTitle');
+  const closeZoomBtn = document.getElementById('closeChartZoomModal');
+
+  function closeZoomModal() {
+    if (charts.zoomChart) {
+      charts.zoomChart.destroy();
+    }
+    chartZoomModal.classList.remove('active');
+  }
+
+  closeZoomBtn?.addEventListener('click', closeZoomModal);
+  chartZoomModal?.addEventListener('click', (e) => {
+    if (e.target === chartZoomModal) {
+      closeZoomModal();
+    }
+  });
+
+  document.querySelectorAll('.chart-container').forEach(container => {
+    const canvas = container.querySelector('canvas');
+    if (canvas) {
+      canvas.addEventListener('click', () => {
+        const chartId = canvas.id;
+        const chartTitle = container.querySelector('h3')?.innerText || 'Gráfico';
+        const chartKey = chartId.replace('Chart', '');
+        const originalChart = charts[chartKey];
+
+        if (!originalChart) {
+          console.error("Gráfico original não encontrado:", chartKey);
+          return;
+        }
+
+        chartZoomContainer.innerHTML = '<canvas id="zoomCanvas"></canvas>';
+        const zoomCanvas = document.getElementById('zoomCanvas');
+        chartZoomTitle.innerText = chartTitle;
+
+        charts.zoomChart = new Chart(zoomCanvas.getContext('2d'), {
+          type: originalChart.config.type,
+          data: originalChart.config.data,
+          options: { ...originalChart.config.options, maintainAspectRatio: false, responsive: true }
+        });
+        chartZoomModal.classList.add('active');
+      });
+    }
+  });
+
+  // --- Lógica do Filtro de Hotel ---
+  const hotelSearchBtn = document.getElementById('hotelSearchBtn');
+  const hotelSearchInput = document.getElementById('hotelSearchInput');
+
+  hotelSearchBtn?.addEventListener('click', handleHotelSearch);
+  hotelSearchInput?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleHotelSearch();
+    }
   });
 }
 
@@ -145,10 +204,11 @@ async function loadB2cData() {
   const resp = await fetch(`/api/b2c?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados B2C');
   const data = await resp.json();
-  const metrics = calculateB2cMetrics(data);
+  allB2cData = data || [];
+  const metrics = calculateB2cMetrics(allB2cData);
   updateB2cMetrics(metrics);
-  updateB2cTable(data || []);
-  updateB2cCharts(data || [], metrics);
+  updateB2cTable(allB2cData);
+  updateB2cCharts(allB2cData, metrics);
 }
 
 // ================== Cálculo de Métricas ==================
@@ -192,31 +252,13 @@ function calculateDailyLeadsMetrics(leads) {
     return { ...totals, dailyData, totalDays: Object.keys(dailyData).length || 1 };
 }
 
-// ====================================================================
-//   SUBSTITUA A FUNÇÃO 'calculateB2cMetrics' INTEIRA POR ESTA VERSÃO
-// ====================================================================
-
 function calculateB2cMetrics(data) {
-  const metrics = { 
-    total_registros: 0, 
-    total_valor: 0, 
-    total_confirmados: 0, 
-    total_pendentes: 0, 
-    total_cancelados: 0, 
-    hoteis_stats: {}, 
-    status_pagamento_stats: {} 
-  };
-
+  const metrics = { total_registros: 0, total_valor: 0, total_confirmados: 0, total_pendentes: 0, total_cancelados: 0, hoteis_stats: {}, status_pagamento_stats: {} };
   if (!Array.isArray(data)) return metrics;
-
   data.forEach(item => {
     metrics.total_registros++;
     metrics.total_valor += Number(item.valor) || 0;
-
-    // **CORREÇÃO FINAL E ROBUSTA: Converte o status para minúsculas antes de comparar**
-    // Isso garante que "Confirmado", "confirmado", "CONFIRMADO", etc., sejam tratados da mesma forma.
-    const status = (item.status || 'pendente').toLowerCase(); // Converte para minúsculas
-
+    const status = (item.status || 'pendente').toLowerCase();
     if (status === 'confirmado' || status === 'ativo') {
       metrics.total_confirmados++;
     } else if (status === 'cancelado') {
@@ -224,25 +266,18 @@ function calculateB2cMetrics(data) {
     } else if (status === 'pendente') {
       metrics.total_pendentes++;
     }
-
     const statusPag = item.status_pagamento || 'NÃO INFORMADO';
     metrics.status_pagamento_stats[statusPag] = (metrics.status_pagamento_stats[statusPag] || 0) + 1;
-
     if (item.nome_hotel) {
-      if (!metrics.hoteis_stats[item.nome_hotel]) { 
-        metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; 
-      }
+      if (!metrics.hoteis_stats[item.nome_hotel]) { metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; }
       metrics.hoteis_stats[item.nome_hotel].valor_total += Number(item.valor) || 0;
       metrics.hoteis_stats[item.nome_hotel].quantidade++;
     }
   });
-
   metrics.hoteis_mais_vendidos = Object.values(metrics.hoteis_stats);
   metrics.status_pagamento = Object.entries(metrics.status_pagamento_stats).map(([status, qtd]) => ({ status_pagamento: status, quantidade: qtd }));
-  
   return metrics;
 }
-
 
 // ================== Atualização da UI (Métricas e Tabelas) ==================
 function updateLeadsMetrics(metrics) {
@@ -339,7 +374,7 @@ function updateLeadsCharts(dailyMetrics) {
     const days = Object.keys(dailyMetrics.dailyData || {});
     const lastDay = days.length > 0 ? days[days.length - 1] : null;
     const dataDay = lastDay ? dailyMetrics.dailyData[lastDay] : { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 };
-    const funnelLabels = ['Entrada de Leads', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
+    const funnelLabels = ['Ask Suite', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
     const funnelValues = [ dataDay.askSuite, dataDay.filaAtendimento, dataDay.atendimento, dataDay.qualificacao, dataDay.oportunidade, dataDay.aguardandoPagamento ];
     charts.leadsFunnel = new Chart(ctx.getContext('2d'), {
       type: 'bar',
@@ -356,122 +391,55 @@ function updateLeadsCharts(dailyMetrics) {
 }
 
 function updateB2cCharts(b2cData, metrics) {
-    // Função auxiliar para criar ou atualizar um gráfico
     function createOrUpdateChart(chartId, chartConfig) {
         const canvas = document.getElementById(chartId);
         if (!canvas) return;
-        if (charts[chartId]) {
-            charts[chartId].destroy();
+        const chartKey = chartId.replace('Chart', '');
+        if (charts[chartKey]) {
+            charts[chartKey].destroy();
         }
-        charts[chartId] = new Chart(canvas.getContext("2d"), chartConfig);
+        charts[chartKey] = new Chart(canvas.getContext("2d"), chartConfig);
     }
 
-    // --- Gráfico 1: Top 5 Hotéis por Valor (Doughnut) ---
     const topHoteisValor = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.valor_total - a.valor_total).slice(0, 5);
     createOrUpdateChart('topHoteisChart', {
         type: "doughnut",
-        data: {
-            labels: topHoteisValor.map(h => h.nome_hotel || "N/A"),
-            datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }]
-        },
+        data: { labels: topHoteisValor.map(h => h.nome_hotel || "N/A"), datasets: [{ data: topHoteisValor.map(h => h.valor_total || 0), backgroundColor: ["#42a5f5", "#ab47bc", "#ffa726", "#66bb6a", "#ef5350"] }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
     });
 
-    // --- Gráfico 2: Status dos Registros (Pie) ---
     createOrUpdateChart('statusChart', {
         type: "pie",
-        data: {
-            labels: ["Confirmados", "Pendentes", "Cancelados"],
-            datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"], borderColor: '#ffffff', borderWidth: 2 }]
-        },
+        data: { labels: ["Confirmados", "Pendentes", "Cancelados"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"], borderColor: '#ffffff', borderWidth: 2 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
     });
 
-    // --- Gráfico 3: Status de Pagamento (Bar) ---
     createOrUpdateChart('statusPagamentoChart', {
         type: "bar",
-        data: {
-            labels: metrics.status_pagamento.map(s => s.status_pagamento),
-            datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }]
-        },
+        data: { labels: metrics.status_pagamento.map(s => s.status_pagamento), datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }] },
         options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
 
-    // --- Gráfico 4: Vendas por Data (Line) ---
-// ====================================================================
-//   DENTRO DA FUNÇÃO 'updateB2cCharts', SUBSTITUA ESTE BLOCO
-// ====================================================================
-
-// Bloco de código ANTIGO a ser substituído:
-/*
-    // --- Gráfico 4: Vendas por Data (Line ) ---
     const vendasData = processTimelineData(b2cData, "data", "valor");
     createOrUpdateChart('vendasTimelineChart', {
         type: "line",
-        data: { ... },
-        options: { ... }
-    });
-*/
-
-// Bloco de código NOVO e CORRIGIDO:
-// --- Gráfico 4: Vendas por Data (Line) ---
-const vendasData = processTimelineData(b2cData, "data", "valor");
-createOrUpdateChart('vendasTimelineChart', {
-    type: "line",
-    data: {
-        labels: vendasData.labels,
-        datasets: [{
-            label: "Vendas (R$)",
-            data: vendasData.data,
-            borderColor: "#4facfe",
-            backgroundColor: "rgba(79, 172, 254, 0.1)",
-            fill: true,
-            tension: 0.4,
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: (v) => formatCurrency(v)
-                }
-            }
-        },
-        // **INÍCIO DA CONFIGURAÇÃO DO PLUGIN DE ZOOM E ROLAGEM**
-        plugins: {
-            zoom: {
-                pan: {
-                    enabled: true, // Habilita a rolagem (arrastar)
-                    mode: 'x',     // Permite rolar apenas no eixo X (horizontal)
-                    modifierKey: 'ctrl', // Opcional: Segure CTRL para rolar
-                },
+        data: { labels: vendasData.labels, datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } },
+            plugins: {
                 zoom: {
-                    wheel: {
-                        enabled: true, // Habilita o zoom com a roda do mouse
-                    },
-                    pinch: {
-                        enabled: true // Habilita o zoom com gesto de pinça (para telas sensíveis ao toque)
-                    },
-                    mode: 'x', // Permite dar zoom apenas no eixo X
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
                 }
             }
         }
-        // **FIM DA CONFIGURAÇÃO DO PLUGIN**
-    }
-});
+    });
 
-
-    // --- Gráfico 5: Top 5 Hotéis por Quantidade (Bar) ---
     const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
     createOrUpdateChart('topHoteisQtdChart', {
         type: "bar",
-        data: {
-            labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"),
-            datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }]
-        },
+        data: { labels: topHoteisQtd.map(h => h.nome_hotel || "N/A"), datasets: [{ label: "Quantidade de Vendas", data: topHoteisQtd.map(h => h.quantidade || 0), backgroundColor: "#42a5f5" }] },
         options: {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw} vendas` } } },
@@ -649,6 +617,9 @@ async function exportToPDF() {
       throw new Error(errData.error || 'Erro ao gerar o PDF.');
     }
     const blob = await resp.blob();
+    // ===================================================================
+//   COLE ESTE BLOCO NO FINAL DO SEU ARQUIVO SCRIPT.JS
+// ===================================================================
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';
@@ -703,70 +674,68 @@ function showToast(message, type = 'info') {
 
   }, 5000);
 }
-// ====================================================================
-//          COLE ESTE BLOCO NO FINAL DO SEU SCRIPT.JS
-// ====================================================================
 
-// Lógica para o Zoom dos Gráficos
-document.addEventListener('DOMContentLoaded', () => {
-    const chartZoomModal = document.getElementById('chartZoomModal');
-    const chartZoomContainer = document.getElementById('chartZoomContainer');
-    const chartZoomTitle = document.getElementById('chartZoomTitle');
-    const closeBtn = document.getElementById('closeChartZoomModal');
+// ================== Lógica do Filtro de Hotel ==================
+// Esta função é chamada pelos event listeners configurados em setupEventListeners
+function handleHotelSearch() {
+    const searchInput = document.getElementById('hotelSearchInput');
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const chartContainer = document.getElementById('hotelSpecificChartContainer');
+    const chartTitle = document.getElementById('hotelSpecificChartTitle');
+    const metricsContainer = document.getElementById('hotelSpecificMetricsContainer');
+    const totalVendasEl = document.getElementById('hotelTotalVendas');
 
-    // Fecha o modal ao clicar no botão 'X'
-    closeBtn?.addEventListener('click', () => {
-        chartZoomModal.classList.remove('active');
-        // Destrói o gráfico clonado para liberar memória
-        if (charts.zoomChart) {
-            charts.zoomChart.destroy();
+    if (!searchTerm) {
+        chartContainer.style.display = 'none';
+        metricsContainer.style.display = 'none';
+        if (charts.hotelSpecific) charts.hotelSpecific.destroy();
+        return;
+    }
+
+    const hotelData = allB2cData.filter(item => 
+        item.nome_hotel && item.nome_hotel.toLowerCase().includes(searchTerm)
+    );
+
+    if (hotelData.length === 0) {
+        showToast(`Nenhum hotel encontrado para "${searchInput.value}"`, 'warning');
+        chartContainer.style.display = 'none';
+        metricsContainer.style.display = 'none';
+        return;
+    }
+    
+    const totalVendas = hotelData.length;
+    totalVendasEl.innerText = totalVendas;
+
+    const hotelName = hotelData[0].nome_hotel;
+    chartTitle.innerText = `Vendas para: ${hotelName}`;
+
+    const timelineData = processTimelineData(hotelData, 'data', 'valor');
+
+    const canvas = document.getElementById('hotelSpecificChart');
+    if (charts.hotelSpecific) charts.hotelSpecific.destroy();
+    
+    charts.hotelSpecific = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: timelineData.labels,
+            datasets: [{
+                label: `Vendas (R$) para ${hotelName}`,
+                data: timelineData.data,
+                borderColor: '#8e44ad',
+                backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } },
+            plugins: { title: { display: true, text: `Timeline de Vendas - ${hotelName}` } }
         }
     });
 
-    // Fecha o modal ao clicar fora do conteúdo
-    chartZoomModal?.addEventListener('click', (e) => {
-        if (e.target === chartZoomModal) {
-            chartZoomModal.classList.remove('active');
-            if (charts.zoomChart) {
-                charts.zoomChart.destroy();
-            }
-        }
-    });
+    metricsContainer.style.display = 'grid';
+    chartContainer.style.display = 'block';
+}
 
-    // Adiciona o evento de clique a todos os contêineres de gráfico
-    document.querySelectorAll('.chart-container').forEach(container => {
-        container.addEventListener('click', () => {
-            const originalCanvas = container.querySelector('canvas');
-            const chartId = originalCanvas.id;
-            const chartTitle = container.querySelector('h3')?.innerText || 'Gráfico';
-
-            // Pega a configuração do gráfico original
-            const originalChart = charts[chartId.replace('Chart', '')] || charts[chartId];
-            if (!originalChart) {
-                console.error("Configuração do gráfico original não encontrada:", chartId);
-                return;
-            }
-
-            // Limpa o contêiner do zoom e cria um novo canvas
-            chartZoomContainer.innerHTML = '<canvas id="zoomCanvas"></canvas>';
-            const zoomCanvas = document.getElementById('zoomCanvas');
-            
-            // Atualiza o título do modal
-            chartZoomTitle.innerText = chartTitle;
-
-            // Clona o gráfico no modal
-            charts.zoomChart = new Chart(zoomCanvas.getContext('2d'), {
-                type: originalChart.config.type,
-                data: originalChart.config.data,
-                options: {
-                    ...originalChart.config.options, // Copia as opções originais
-                    maintainAspectRatio: false, // Permite que o gráfico preencha o contêiner
-                    responsive: true
-                }
-            });
-
-            // Mostra o modal
-            chartZoomModal.classList.add('active');
-        });
-    });
-});

@@ -142,6 +142,61 @@
                         <i class="fas fa-plus"></i> Adicionar B2C
                     </button>
                 </div>
+<!-- ======================================================== -->
+<!--      INÍCIO DA SEÇÃO DE FILTRO POR HOTEL (HTML)        -->
+<!-- ======================================================== -->
+<div class="section-header">
+    <h2>Análise por Hotel</h2>
+</div>
+<div class="hotel-filter-container">
+    <!-- ======================================================== -->
+<!--      INÍCIO DA SEÇÃO DE FILTRO POR HOTEL (HTML)        -->
+<!-- ======================================================== -->
+<div class="section-header">
+    <h2>Análise por Hotel</h2>
+</div>
+<div class="hotel-filter-container">
+    <!-- ... seu campo de busca e botão ... -->
+</div>
+
+<!-- ======================================================== -->
+<!--    ADICIONE O NOVO CARD DE MÉTRICA AQUI ABAIXO         -->
+<!-- ======================================================== -->
+<div class="metrics-grid" id="hotelSpecificMetricsContainer" style="display: none;">
+    <div class="metric-card">
+        <div class="metric-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="metric-content">
+            <h3 id="hotelTotalVendas">0</h3>
+            <p>Total de Vendas</p>
+        </div>
+    </div>
+</div>
+<!-- ======================================================== -->
+
+<!-- Contêiner onde o gráfico específico do hotel aparecerá -->
+<div class="chart-container" id="hotelSpecificChartContainer" style="display: none;">
+    <!-- ... seu canvas do gráfico ... -->
+</div>
+
+    <div class="filter-group">
+        <label for="hotelSearchInput">Digite o nome do Hotel:</label>
+        <input type="text" id="hotelSearchInput" class="text-input" placeholder="Ex: Portobello Resort...">
+    </div>
+    <button class="btn btn-secondary" id="hotelSearchBtn">
+        <i class="fas fa-search"></i> Buscar
+    </button>
+</div>
+
+<!-- Contêiner onde o gráfico específico do hotel aparecerá -->
+<div class="chart-container" id="hotelSpecificChartContainer" style="display: none;">
+    <h3 id="hotelSpecificChartTitle">Vendas para o Hotel</h3>
+    <canvas id="hotelSpecificChart"></canvas>
+</div>
+<!-- ======================================================== -->
+<!--        FIM DA SEÇÃO DE FILTRO POR HOTEL (HTML)         -->
+<!-- ======================================================== -->
 
                 <!-- B2C Metrics Cards -->
                 <div class="metrics-grid">
