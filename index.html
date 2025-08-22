@@ -7,81 +7,48 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Cabeçalho -->
         <header class="header">
             <div class="header-content">
                 <h1 class="logo">
-                    <img src="{{ url_for('static', filename='logo.png' ) }}" alt="Dashboard Analytics " class="logo-image">
+                    <img src="{{ url_for('static', filename='logo.png'  ) }}" alt="Dashboard Analytics" class="logo-image">
                     Dashboard Analytics CRM B2C
                 </h1>
                 <div class="header-actions">
-                    <button class="btn btn-primary" id="exportPdfBtn">
-                        <i class="fas fa-file-pdf"></i>
-                        Exportar PDF
-                    </button>
+                    <button class="btn btn-primary" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
                 </div>
             </div>
         </header>
 
-        <!-- Navigation -->
+        <!-- Navegação -->
         <nav class="navigation">
             <div class="nav-tabs">
-                <button class="nav-tab active" data-tab="leads">
-                    <i class="fas fa-users"></i>
-                    Leads
-                </button>
-                <button class="nav-tab" data-tab="b2c">
-                    <i class="fas fa-hotel"></i>
-                    B2C
-                </button>
+                <button class="nav-tab active" data-tab="leads"><i class="fas fa-users"></i> Leads</button>
+                <button class="nav-tab" data-tab="b2c"><i class="fas fa-hotel"></i> B2C</button>
             </div>
         </nav>
 
-        <!-- Date Filter -->
+        <!-- Filtro de Datas -->
         <div class="date-filter">
             <div class="filter-content">
-                <div class="filter-group">
-                    <label for="dataInicio">Data Início:</label>
-                    <input type="date" id="dataInicio" class="date-input">
-                </div>
-                <div class="filter-group">
-                    <label for="dataFim">Data Fim:</label>
-                    <input type="date" id="dataFim" class="date-input">
-                </div>
-                <button class="btn btn-secondary" id="applyFilterBtn">
-                    <i class="fas fa-filter"></i>
-                    Aplicar Filtro
-                </button>
-                <button class="btn btn-outline" id="clearFilterBtn">
-                    <i class="fas fa-times"></i>
-                    Limpar
-                </button>
+                <div class="filter-group"><label for="dataInicio">Data Início:</label><input type="date" id="dataInicio" class="date-input"></div>
+                <div class="filter-group"><label for="dataFim">Data Fim:</label><input type="date" id="dataFim" class="date-input"></div>
+                <button class="btn btn-secondary" id="applyFilterBtn"><i class="fas fa-filter"></i> Aplicar Filtro</button>
+                <button class="btn btn-outline" id="clearFilterBtn"><i class="fas fa-times"></i> Limpar</button>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Conteúdo Principal -->
         <main class="main-content">
 
-            <!-- ======================================================== -->
-            <!--                 INÍCIO DA SEÇÃO DE LEADS                 -->
-            <!-- ======================================================== -->
+            <!-- ================== SEÇÃO DE LEADS ================== -->
             <div class="tab-content active" id="leads-content">
-                <div class="section-header">
-                    <h2>Análise de Leads</h2>
-                    <button class="btn btn-success" id="addLeadBtn">
-                        <i class="fas fa-plus"></i>
-                        Adicionar Lead
-                    </button>
-                </div>
-
-                <!-- Leads Metrics Cards -->
+                <div class="section-header"><h2>Análise de Leads</h2><button class="btn btn-success" id="addLeadBtn"><i class="fas fa-plus"></i> Adicionar Lead</button></div>
                 <div class="metrics-grid">
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-users"></i></div><div class="metric-content"><h3 id="totalLeads">0</h3><p>Total de Leads</p></div></div>
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-inbox"></i></div><div class="metric-content"><h3 id="leadsAskSuite">0</h3><p>Entrada Leads</p></div></div>
@@ -91,305 +58,50 @@
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-star"></i></div><div class="metric-content"><h3 id="leadsOportunidade">0</h3><p>Oportunidades</p></div></div>
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-credit-card"></i></div><div class="metric-content"><h3 id="leadsAguardandoPagamento">0</h3><p>Aguardando Pagamento</p></div></div>
                 </div>
-
-                <!-- Leads Charts -->
-           <!-- DENTRO DA SEÇÃO B2C, ENCONTRE A GRADE DE GRÁFICOS -->
-<div class="charts-grid">
-    <!-- ... outros gráficos como Top 5, Status, etc. ... -->
-    <div class="chart-container">
-        <h3>Top 5 Hotéis por Quantidade Vendida</h3>
-        <canvas id="topHoteisQtdChart"></canvas>
-    </div>
-
-    <!-- ======================================================== -->
-    <!--      ADICIONE O NOVO GRÁFICO COMPARATIVO AQUI          -->
-    <!-- ======================================================== -->
-    <div class="chart-container chart-container-large">
-        <h3>Comparativo de Vendas por Hotel</h3>
-        <canvas id="hotelComparisonChart"></canvas>
-    </div>
-    <!-- ======================================================== -->
-
-</div>
-
-             
-                <!-- Leads Table Section -->
-                <div class="section-header">
-                    <h3>Lista de Leads</h3>
-                    <button class="btn btn-secondary" id="toggleLeadsBtn">👁️ Mostrar/Esconder</button>
-                </div>
-                <div class="table-container" id="leadsTableContainer" style="display:none;">
-                    <div class="table-wrapper">
-                        <table class="data-table" id="leadsTable">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Entrada Leads</th>
-                                    <th>Fila Atendimento</th>
-                                    <th>Atendimento</th>
-                                    <th>Qualificação</th>
-                                    <th>Oportunidade</th>
-                                    <th>Aguardando Pagamento</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leadsTableBody">
-                                <!-- Dados inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="charts-grid"><div class="chart-container"><h3>Funil de Conversão</h3><canvas id="leadsFunnelChart"></canvas></div></div>
+                <div class="section-header"><h3>Lista de Leads</h3><button class="btn btn-secondary" id="toggleLeadsBtn">👁️ Mostrar/Esconder</button></div>
+                <div class="table-container" id="leadsTableContainer" style="display:none;"><div class="table-wrapper"><table class="data-table" id="leadsTable"><thead><tr><th>Data</th><th>Entrada Leads</th><th>Fila Atendimento</th><th>Atendimento</th><th>Qualificação</th><th>Oportunidade</th><th>Aguardando Pagamento</th><th>Ações</th></tr></thead><tbody id="leadsTableBody"></tbody></table></div></div>
             </div>
-            <!-- ======================================================== -->
-            <!--                   FIM DA SEÇÃO DE LEADS                  -->
-            <!-- ======================================================== -->
 
-
-            <!-- ======================================================== -->
-            <!--                  INÍCIO DA SEÇÃO B2C                     -->
-            <!-- ======================================================== -->
+            <!-- ================== SEÇÃO B2C ================== -->
             <div class="tab-content" id="b2c-content">
-                <div class="section-header">
-                    <h2>B2C</h2>
-                    <button id="addB2cBtn" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Adicionar B2C
-                    </button>
+                <div class="section-header"><h2>B2C</h2><button id="addB2cBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar B2C</button></div>
+                
+                <div class="section-header"><h2>Análise por Hotel</h2></div>
+                <div class="hotel-filter-container">
+                    <div class="filter-group"><label for="hotelSearchInput">Digite o nome do Hotel:</label><input type="text" id="hotelSearchInput" class="text-input" placeholder="Ex: Portobello Resort..."></div>
+                    <button class="btn btn-secondary" id="hotelSearchBtn"><i class="fas fa-search"></i> Buscar</button>
                 </div>
-<!-- ======================================================== -->
-<!--      INÍCIO DA SEÇÃO DE FILTRO POR HOTEL (HTML)        -->
-<!-- ======================================================== -->
-<div class="section-header">
-    <h2>Análise por Hotel</h2>
-</div>
-<div class="hotel-filter-container">
-<!-- ======================================================== -->
-<!--    APAGUE COMPLETAMENTE ESTE BLOCO DE CÓDIGO DO SEU HTML -->
-<!-- ======================================================== -->
-<div class="metrics-grid" id="hotelSpecificMetricsContainer" style="display: none;">
-    <div class="metric-card">
-        <div class="metric-icon">
-            <i class="fas fa-shopping-cart"></i>
-        </div>
-        <div class="metric-content">
-            <h3 id="hotelTotalVendas">0</h3>
-            <p>Total de Vendas</p>
-        </div>
-    </div>
-    <div class="metric-card">
-        <div class="metric-icon">
-            <i class="fas fa-dollar-sign"></i>
-        </div>
-        <div class="metric-content">
-            <h3 id="hotelValorTotalVendido">R$ 0,00</h3>
-            <p>Valor Total Vendido</p>
-        </div>
-    </div>
-</div>
 
-
-<!-- ======================================================== -->
-<!--    ADICIONE O NOVO CARD DE MÉTRICA AQUI ABAIXO         -->
-<!-- ======================================================== -->
-<div class="metrics-grid" id="hotelSpecificMetricsContainer" style="display: none;">
-    <div class="metric-card">
-        <div class="metric-icon">
-            <i class="fas fa-shopping-cart"></i>
-        </div>
-        <div class="metric-content">
-            <h3 id="hotelTotalVendas">0</h3>
-            <p>Total de Vendas</p>
-        </div>
-    </div>
-</div>
-<!-- ======================================================== -->
-
-<!-- Contêiner onde o gráfico específico do hotel aparecerá -->
-<div class="chart-container" id="hotelSpecificChartContainer" style="display: none;">
-    <!-- ... seu canvas do gráfico ... -->
-</div>
-
-    <div class="filter-group">
-        <label for="hotelSearchInput">Digite o nome do Hotel:</label>
-        <input type="text" id="hotelSearchInput" class="text-input" placeholder="Ex: Portobello Resort...">
-    </div>
-    <button class="btn btn-secondary" id="hotelSearchBtn">
-        <i class="fas fa-search"></i> Buscar
-    </button>
-</div>
-
-<!-- Contêiner onde o gráfico específico do hotel aparecerá -->
-<div class="chart-container" id="hotelSpecificChartContainer" style="display: none;">
-    <h3 id="hotelSpecificChartTitle">Vendas para o Hotel</h3>
-    <canvas id="hotelSpecificChart"></canvas>
-</div>
-<!-- ======================================================== -->
-<!--        FIM DA SEÇÃO DE FILTRO POR HOTEL (HTML)         -->
-<!-- ======================================================== -->
-
-                <!-- B2C Metrics Cards -->
                 <div class="metrics-grid">
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-hotel"></i></div><div class="metric-content"><h3 id="totalB2cRegistros">0</h3><p>Total de Registros</p></div></div>
                     <div class="metric-card"><div class="metric-icon"><i class="fas fa-dollar-sign"></i></div><div class="metric-content"><h3 id="totalB2cValor">R$ 0,00</h3><p>Valor Total</p></div></div>
                 </div>
 
-                <!-- B2C Charts -->
                 <div class="charts-grid">
-                    <div class="chart-container"><h3>Top 5 Hotéis Mais Vendidos por Valor</h3><canvas id="topHoteisChart"></canvas></div>
+                    <div class="chart-container"><h3>Top 5 Hotéis Mais Vendidos</h3><canvas id="topHoteisChart"></canvas></div>
                     <div class="chart-container"><h3>Status dos Registros</h3><canvas id="statusChart"></canvas></div>
                     <div class="chart-container"><h3>Status de Pagamento</h3><canvas id="statusPagamentoChart"></canvas></div>
-                    <div class="chart-container chart-container-large"><h3>Vendas por Data</h3><canvas id="vendasTimelineChart"></canvas></div>
-                    <div class="chart-container"><h3>Top 5 Hotéis por Quantidade Vendida</h3><canvas id="topHoteisQtdChart"></canvas></div>
+                    <div class="chart-container"><h3>Formas de Pagamento</h3><canvas id="formaPagamentoChart"></canvas></div>
+                    <div class="chart-container"><h3>Uso de Cupons</h3><canvas id="cupomChart"></canvas></div>
+                    <div class="chart-container"><h3>Top 5 Hotéis (Qtd)</h3><canvas id="topHoteisQtdChart"></canvas></div>
                 </div>
 
-                <!-- B2C Table Section -->
-                <div class="section-header">
-                    <h3>Lista B2C</h3>
-                    <button class="btn btn-secondary" id="toggleB2cBtn">👁️ Mostrar/Esconder</button>
-                </div>
-                <div class="table-container" id="b2cTableContainer" style="display:none;">
-                    <div class="table-wrapper">
-                        <table class="data-table" id="b2cTable">
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Hotel</th>
-                                    <th>Valor</th>
-                                    <th>Status</th>
-                                    <th>Status Pagamento</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="b2cTableBody">
-                                <!-- Dados inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <div class="section-header"><h3>Lista B2C</h3><button class="btn btn-secondary" id="toggleB2cBtn">👁️ Mostrar/Esconder</button></div>
+                <div class="table-container" id="b2cTableContainer" style="display:none;"><div class="table-wrapper"><table class="data-table" id="b2cTable"><thead><tr><th>Data</th><th>Hotel</th><th>Valor</th><th>Status</th><th>Status Pagamento</th><th>Ações</th></tr></thead><tbody id="b2cTableBody"></tbody></table></div></div>
             </div>
-            <!-- ======================================================== -->
-            <!--                    FIM DA SEÇÃO B2C                      -->
-            <!-- ======================================================== -->
-
         </main>
     </div>
     
-    <!-- ======================================================== -->
-    <!--                        MODAIS                            -->
-    <!-- ======================================================== -->
-
-    <!-- Lead Modal -->
-    <div class="modal" id="leadModal">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="leadModalTitle">Adicionar Lead</h3><button class="modal-close" id="closeLeadModal"><i class="fas fa-times"></i></button></div>
-            <form id="leadForm">
-                <div class="form-group"><label for="leadDataEntrada">Data de Entrada:</label><input type="date" id="leadDataEntrada" name="data_entrada" required></div>
-                <div class="form-group"><label for="leadAskSuite">Entrada Leads</label><input type="text" id="leadAskSuite" name="entrada_leads_ask_suite"></div>
-                <div class="form-group"><label for="leadFilaAtendimento">Fila de Atendimento:</label><input type="text" id="leadFilaAtendimento" name="fila_atendimento"></div>
-                <div class="form-group"><label for="leadAtendimento">Atendimento:</label><input type="text" id="leadAtendimento" name="atendimento"></div>
-                <div class="form-group"><label for="leadQualificacao">Qualificação:</label><input type="text" id="leadQualificacao" name="qualificacao"></div>
-                <div class="form-group"><label for="leadOportunidade">Oportunidade:</label><input type="text" id="leadOportunidade" name="oportunidade"></div>
-                <div class="form-group"><label for="leadAguardandoPagamento">Aguardando Pagamento:</label><input type="text" id="leadAguardandoPagamento" name="aguardando_pagamento"></div>
-                <div class="form-actions"><button type="button" class="btn btn-outline" id="cancelLeadBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
-            </form>
-        </div>
-    </div>
-
-   <div class="modal" id="b2cModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="b2cModalTitle">Adicionar B2C</h3>
-            <button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button>
-        </div>
-        <form id="b2cForm">
-            <div class="form-group">
-                <label for="b2cData">Data:</label>
-                <input type="date" id="b2cData" name="data" required>
-            </div>
-            <div class="form-group">
-                <label for="b2cNomeHotel">Nome do Hotel:</label>
-                <input type="text" id="b2cNomeHotel" name="nome_hotel" required>
-            </div>
-            <div class="form-group">
-                <label for="b2cValor">Valor:</label>
-                <input type="number" id="b2cValor" name="valor" step="0.01" required>
-            </div>
-
-            <!-- ======================================================== -->
-            <!--      INÍCIO DOS NOVOS CAMPOS ADICIONADOS               -->
-            <!-- ======================================================== -->
-            <div class="form-group">
-                <label for="b2cFormaPagamento">Forma de Pagamento:</label>
-                <select id="b2cFormaPagamento" name="forma_pagamento" required>
-                    <option value="Não Informado">Selecione...</option>
-                    <option value="Crédito">Crédito</option>
-                    <option value="Débito">Débito</option>
-                    <option value="Boleto">Boleto</option>
-                    <option value="Depósito Bancário">Depósito Bancário</option>
-                    <option value="Faturado">Faturado</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="b2cUsouCupom">Usou Cupom de Desconto?</label>
-                <select id="b2cUsouCupom" name="usou_cupom" required>
-                    <option value="false">Não</option>
-                    <option value="true">Sim</option>
-                </select>
-            </div>
-            <!-- ======================================================== -->
-            <!--        FIM DOS NOVOS CAMPOS ADICIONADOS                -->
-            <!-- ======================================================== -->
-
-            <div class="form-group">
-                <label for="b2cStatus">Status:</label>
-                <select id="b2cStatus" name="status" required>
-                    <option value="">Selecione...</option>
-                    <option value="Ativo">Ativo</option>
-                    <option value="Pendente">Pendente</option>
-                    <option value="Cancelado">Cancelado</option>
-                    <option value="Confirmado">Confirmado</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="b2cStatusPagamento">Status de Pagamento:</label>
-                <select id="b2cStatusPagamento" name="status_pagamento" required>
-                    <option value="">Selecione...</option>
-                    <option value="Pago">Pago</option>
-                    <option value="Pendente">Pendente</option>
-                    <option value="Atrasado">Atrasado</option>
-                    <option value="Cancelado">Cancelado</option>
-                </select>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-    <!-- Loading Overlay -->
+    <!-- ================== MODAIS ================== -->
+    <div class="modal" id="leadModal"><div class="modal-content"><div class="modal-header"><h3 id="leadModalTitle">Adicionar Lead</h3><button class="modal-close" id="closeLeadModal"><i class="fas fa-times"></i></button></div><form id="leadForm"><div class="form-group"><label for="leadDataEntrada">Data de Entrada:</label><input type="date" id="leadDataEntrada" name="data_entrada" required></div><div class="form-group"><label for="leadAskSuite">Entrada Leads</label><input type="text" id="leadAskSuite" name="entrada_leads_ask_suite"></div><div class="form-group"><label for="leadFilaAtendimento">Fila de Atendimento:</label><input type="text" id="leadFilaAtendimento" name="fila_atendimento"></div><div class="form-group"><label for="leadAtendimento">Atendimento:</label><input type="text" id="leadAtendimento" name="atendimento"></div><div class="form-group"><label for="leadQualificacao">Qualificação:</label><input type="text" id="leadQualificacao" name="qualificacao"></div><div class="form-group"><label for="leadOportunidade">Oportunidade:</label><input type="text" id="leadOportunidade" name="oportunidade"></div><div class="form-group"><label for="leadAguardandoPagamento">Aguardando Pagamento:</label><input type="text" id="leadAguardandoPagamento" name="aguardando_pagamento"></div><div class="form-actions"><button type="button" class="btn btn-outline" id="cancelLeadBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div></form></div></div>
+    <div class="modal" id="b2cModal"><div class="modal-content"><div class="modal-header"><h3 id="b2cModalTitle">Adicionar B2C</h3><button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button></div><form id="b2cForm"><div class="form-group"><label for="b2cData">Data:</label><input type="date" id="b2cData" name="data" required></div><div class="form-group"><label for="b2cNomeHotel">Nome do Hotel:</label><input type="text" id="b2cNomeHotel" name="nome_hotel" required></div><div class="form-group"><label for="b2cValor">Valor:</label><input type="number" id="b2cValor" name="valor" step="0.01" required></div><div class="form-group"><label for="b2cFormaPagamento">Forma de Pagamento:</label><select id="b2cFormaPagamento" name="forma_pagamento" required><option value="Não Informado">Selecione...</option><option value="Crédito">Crédito</option><option value="Débito">Débito</option><option value="Boleto">Boleto</option><option value="Depósito Bancário">Depósito Bancário</option><option value="Faturado">Faturado</option></select></div><div class="form-group"><label for="b2cUsouCupom">Usou Cupom de Desconto?</label><select id="b2cUsouCupom" name="usou_cupom" required><option value="false">Não</option><option value="true">Sim</option></select></div><div class="form-group"><label for="b2cStatus">Status:</label><select id="b2cStatus" name="status" required><option value="">Selecione...</option><option value="Ativo">Ativo</option><option value="Pendente">Pendente</option><option value="Cancelado">Cancelado</option><option value="Confirmado">Confirmado</option></select></div><div class="form-group"><label for="b2cStatusPagamento">Status de Pagamento:</label><select id="b2cStatusPagamento" name="status_pagamento" required><option value="">Selecione...</option><option value="Pago">Pago</option><option value="Pendente">Pendente</option><option value="Atrasado">Atrasado</option><option value="Cancelado">Cancelado</option></select></div><div class="form-actions"><button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div></form></div></div>
+    <div class="modal" id="chartZoomModal"><div class="modal-content modal-content-large"><div class="modal-header"><h3 id="chartZoomTitle">Visualização do Gráfico</h3><button class="modal-close" id="closeChartZoomModal"><i class="fas fa-times"></i></button></div><div class="chart-zoom-container" id="chartZoomContainer"></div></div></div>
+    
+    <!-- Utilitários da UI -->
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><p>Carregando...</p></div></div>
-
-    <!-- Toast Notifications -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-
-    <!-- =================================== -->
-<!--      MODAL PARA ZOOM DO GRÁFICO     -->
-<!-- =================================== -->
-<div class="modal" id="chartZoomModal">
-    <div class="modal-content modal-content-large">
-        <div class="modal-header">
-            <h3 id="chartZoomTitle">Visualização do Gráfico</h3>
-            <button class="modal-close" id="closeChartZoomModal"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="chart-zoom-container" id="chartZoomContainer">
-            <!-- O gráfico ampliado será inserido aqui pelo JavaScript -->
-        </div>
-    </div>
-</div>
-
 </body>
 </html>

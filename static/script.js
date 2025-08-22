@@ -1,18 +1,18 @@
 // ===================================================================
-//   SCRIPT.JS - VERSÃO FINAL COMPLETA E ESTRUTURADA
+//   SCRIPT.JS - VERSÃO FINAL COMPLETA E CORRIGIDA
 // ===================================================================
 
 let currentTab = 'leads';
 let currentFilters = { dataInicio: '', dataFim: '' };
 let charts = {};
 let editingId = null;
-let allB2cData = []; // Armazena todos os dados B2C para filtragem no front-end
+let allB2cData = [];
 
 // ================== Inicialização Principal ==================
 document.addEventListener('DOMContentLoaded', () => {
-  setupEventListeners(); // Configura TODOS os eventos da página
-  setDefaultDates();     // Define as datas padrão do filtro
-  switchTab('leads');      // Carrega a primeira aba
+  setupEventListeners();
+  setDefaultDates();
+  switchTab('leads');
 });
 
 // ================== Funções Auxiliares (Helpers) ==================
@@ -35,31 +35,22 @@ function formatCurrency(value) {
 
 // ================== Configuração Centralizada de Eventos ==================
 function setupEventListeners() {
-  // --- Eventos de Navegação e Filtros ---
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
   document.getElementById('applyFilterBtn')?.addEventListener('click', applyFilters);
   document.getElementById('clearFilterBtn')?.addEventListener('click', clearFilters);
-
-  // --- Botões Principais (Adicionar, Exportar) ---
   document.getElementById('addLeadBtn')?.addEventListener('click', () => openModal('lead'));
   document.getElementById('addB2cBtn')?.addEventListener('click', () => openModal('b2c'));
   document.getElementById('exportPdfBtn')?.addEventListener('click', exportToPDF);
-
-  // --- Eventos dos Modais ---
   document.getElementById('leadModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('lead'); });
   document.getElementById('b2cModal')?.addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal('b2c'); });
   document.getElementById('closeLeadModal')?.addEventListener('click', () => closeModal('lead'));
   document.getElementById('closeB2cModal')?.addEventListener('click', () => closeModal('b2c'));
   document.getElementById('cancelLeadBtn')?.addEventListener('click', () => closeModal('lead'));
   document.getElementById('cancelB2cBtn')?.addEventListener('click', () => closeModal('b2c'));
-
-  // --- Eventos dos Formulários ---
   document.getElementById('leadForm')?.addEventListener('submit', handleLeadSubmit);
   document.getElementById('b2cForm')?.addEventListener('submit', handleB2cSubmit);
-
-  // --- Botões de Mostrar/Esconder Tabelas ---
   document.getElementById('toggleLeadsBtn')?.addEventListener('click', () => {
     const container = document.getElementById('leadsTableContainer');
     if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
@@ -69,73 +60,29 @@ function setupEventListeners() {
     if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
   });
 
-  // --- Lógica do Zoom dos Gráficos ---
   const chartZoomModal = document.getElementById('chartZoomModal');
-  const chartZoomContainer = document.getElementById('chartZoomContainer');
-  const chartZoomTitle = document.getElementById('chartZoomTitle');
   const closeZoomBtn = document.getElementById('closeChartZoomModal');
+  closeZoomBtn?.addEventListener('click', () => chartZoomModal.classList.remove('active'));
+  chartZoomModal?.addEventListener('click', (e) => { if (e.target === chartZoomModal) chartZoomModal.classList.remove('active'); });
 
-  function closeZoomModal() {
-    if (charts.zoomChart) {
-      charts.zoomChart.destroy();
-    }
-    chartZoomModal.classList.remove('active');
-  }
-
-  closeZoomBtn?.addEventListener('click', closeZoomModal);
-  chartZoomModal?.addEventListener('click', (e) => {
-    if (e.target === chartZoomModal) {
-      closeZoomModal();
-    }
+  document.querySelectorAll('.chart-container canvas').forEach(canvas => {
+    canvas.addEventListener('click', () => {
+        const chartKey = Object.keys(charts).find(key => charts[key].canvas === canvas);
+        if (charts[chartKey]) openChartZoom(charts[chartKey]);
+    });
   });
 
-  document.querySelectorAll('.chart-container').forEach(container => {
-    const canvas = container.querySelector('canvas');
-    if (canvas) {
-      canvas.addEventListener('click', () => {
-        const chartId = canvas.id;
-        const chartTitle = container.querySelector('h3')?.innerText || 'Gráfico';
-        const chartKey = chartId.replace('Chart', '');
-        const originalChart = charts[chartKey];
-
-        if (!originalChart) {
-          console.error("Gráfico original não encontrado:", chartKey);
-          return;
-        }
-
-        chartZoomContainer.innerHTML = '<canvas id="zoomCanvas"></canvas>';
-        const zoomCanvas = document.getElementById('zoomCanvas');
-        chartZoomTitle.innerText = chartTitle;
-
-        charts.zoomChart = new Chart(zoomCanvas.getContext('2d'), {
-          type: originalChart.config.type,
-          data: originalChart.config.data,
-          options: { ...originalChart.config.options, maintainAspectRatio: false, responsive: true }
-        });
-        chartZoomModal.classList.add('active');
-      });
-    }
-  });
-
-  // --- Lógica do Filtro de Hotel ---
   const hotelSearchBtn = document.getElementById('hotelSearchBtn');
   const hotelSearchInput = document.getElementById('hotelSearchInput');
-
   hotelSearchBtn?.addEventListener('click', handleHotelSearch);
-  hotelSearchInput?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      handleHotelSearch();
-    }
-  });
+  hotelSearchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleHotelSearch(); });
 }
 
 // ================== Navegação e Filtros ==================
 function switchTab(tabName) {
   if (!tabName) return;
   currentTab = tabName;
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.tab === tabName);
-  });
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabName));
   document.getElementById('leads-content').style.display = (tabName === 'leads') ? 'grid' : 'none';
   document.getElementById('b2c-content').style.display = (tabName === 'b2c') ? 'grid' : 'none';
   loadData();
@@ -143,11 +90,11 @@ function switchTab(tabName) {
 
 function setDefaultDates() {
   const today = new Date(); 
-  const firstDayOfYear = new Date(2025, 0, 1); 
+  const firstDayOfYear = new Date(today.getFullYear(), 0, 1); 
   const inicioInput = document.getElementById('dataInicio');
   const fimInput = document.getElementById('dataFim');
-  if (inicioInput && !inicioInput.value) inicioInput.value = formatDate(firstDayOfYear);
-  if (fimInput && !fimInput.value) fimInput.value = formatDate(today);
+  if (inicioInput) inicioInput.value = formatDate(firstDayOfYear);
+  if (fimInput) fimInput.value = formatDate(today);
   currentFilters.dataInicio = inicioInput?.value || '';
   currentFilters.dataFim = fimInput?.value || '';
 }
@@ -192,32 +139,22 @@ async function loadLeadsData() {
   const resp = await fetch(`/api/leads?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados de Leads');
   const leads = await resp.json();
-  const metrics = calculateLeadsMetrics(leads);
-  const dailyMetrics = calculateDailyLeadsMetrics(leads);
-  updateLeadsMetrics(metrics);
+  updateLeadsMetrics(calculateLeadsMetrics(leads));
   updateLeadsTable(leads || []);
-  updateLeadsCharts(dailyMetrics);
+  updateLeadsCharts(calculateDailyLeadsMetrics(leads));
 }
 
 async function loadB2cData() {
   const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
   const resp = await fetch(`/api/b2c?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados B2C');
-  
   const data = await resp.json();
   allB2cData = data || [];
-  
   const metrics = calculateB2cMetrics(allB2cData);
   updateB2cMetrics(metrics);
   updateB2cTable(allB2cData);
   updateB2cCharts(allB2cData, metrics);
-  
-  // ========================================================
-  //   ADICIONE APENAS ESTA LINHA DE CÓDIGO NO FINAL
-  // ========================================================
-  updateHotelComparisonChart(allB2cData);
 }
-
 
 // ================== Cálculo de Métricas ==================
 function calculateLeadsMetrics(leads) {
@@ -261,29 +198,52 @@ function calculateDailyLeadsMetrics(leads) {
 }
 
 function calculateB2cMetrics(data) {
-  const metrics = { total_registros: 0, total_valor: 0, total_confirmados: 0, total_pendentes: 0, total_cancelados: 0, hoteis_stats: {}, status_pagamento_stats: {} };
+  const metrics = { 
+    total_registros: 0, 
+    total_valor: 0, 
+    total_confirmados: 0, 
+    total_pendentes: 0, 
+    total_cancelados: 0, 
+    hoteis_stats: {}, 
+    status_pagamento_stats: {},
+    forma_pagamento_stats: {},
+    cupom_stats: { 'Sim': 0, 'Não': 0 } 
+  };
+
   if (!Array.isArray(data)) return metrics;
+
   data.forEach(item => {
     metrics.total_registros++;
     metrics.total_valor += Number(item.valor) || 0;
+    
     const status = (item.status || 'pendente').toLowerCase();
-    if (status === 'confirmado' || status === 'ativo') {
-      metrics.total_confirmados++;
-    } else if (status === 'cancelado') {
-      metrics.total_cancelados++;
-    } else if (status === 'pendente') {
-      metrics.total_pendentes++;
-    }
-    const statusPag = item.status_pagamento || 'NÃO INFORMADO';
+    if (status === 'confirmado' || status === 'ativo') metrics.total_confirmados++;
+    else if (status === 'cancelado') metrics.total_cancelados++;
+    else if (status === 'pendente') metrics.total_pendentes++;
+    
+    const statusPag = item.status_pagamento || 'Não Informado';
     metrics.status_pagamento_stats[statusPag] = (metrics.status_pagamento_stats[statusPag] || 0) + 1;
+
+    const formaPag = item.forma_pagamento || 'Não Informado';
+    metrics.forma_pagamento_stats[formaPag] = (metrics.forma_pagamento_stats[formaPag] || 0) + 1;
+
+    if (item.usou_cupom === true || item.usou_cupom === 'true') {
+        metrics.cupom_stats['Sim']++;
+    } else {
+        metrics.cupom_stats['Não']++;
+    }
+
     if (item.nome_hotel) {
       if (!metrics.hoteis_stats[item.nome_hotel]) { metrics.hoteis_stats[item.nome_hotel] = { nome_hotel: item.nome_hotel, valor_total: 0, quantidade: 0 }; }
       metrics.hoteis_stats[item.nome_hotel].valor_total += Number(item.valor) || 0;
       metrics.hoteis_stats[item.nome_hotel].quantidade++;
     }
   });
+
   metrics.hoteis_mais_vendidos = Object.values(metrics.hoteis_stats);
   metrics.status_pagamento = Object.entries(metrics.status_pagamento_stats).map(([status, qtd]) => ({ status_pagamento: status, quantidade: qtd }));
+  metrics.forma_pagamento = Object.entries(metrics.forma_pagamento_stats).map(([forma, qtd]) => ({ forma_pagamento: forma, quantidade: qtd }));
+  
   return metrics;
 }
 
@@ -309,20 +269,7 @@ function updateLeadsTable(leads) {
   tbody.innerHTML = '';
   (leads || []).forEach(lead => {
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${formatDateBR(lead.data_entrada)}</td>
-      <td>${lead.entrada_leads_ask_suite || '-'}</td>
-      <td>${lead.fila_atendimento || '-'}</td>
-      <td>${lead.atendimento || '-'}</td>
-      <td>${lead.qualificacao || '-'}</td>
-      <td>${lead.oportunidade || '-'}</td>
-      <td>${lead.aguardando_pagamento || '-'}</td>
-      <td>
-        <div class="action-buttons">
-          <button class="btn btn-primary" data-id="${lead.id}" data-action="edit-lead"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger" data-id="${lead.id}" data-action="delete-lead"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>`;
+    row.innerHTML = `<td>${formatDateBR(lead.data_entrada)}</td><td>${lead.entrada_leads_ask_suite || '-'}</td><td>${lead.fila_atendimento || '-'}</td><td>${lead.atendimento || '-'}</td><td>${lead.qualificacao || '-'}</td><td>${lead.oportunidade || '-'}</td><td>${lead.aguardando_pagamento || '-'}</td><td><div class="action-buttons"><button class="btn btn-primary" data-id="${lead.id}" data-action="edit-lead"><i class="fas fa-edit"></i></button><button class="btn btn-danger" data-id="${lead.id}" data-action="delete-lead"><i class="fas fa-trash"></i></button></div></td>`;
     tbody.appendChild(row);
   });
   addTableActionListeners(tbody);
@@ -336,18 +283,7 @@ function updateB2cTable(b2cData) {
     const statusClass = (item.status || 'pendente').toLowerCase().replace(/\s+/g, '-');
     const pagClass = (item.status_pagamento || 'nao-informado').toLowerCase().replace(/\s+/g, '-');
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${formatDateBR(item.data)}</td>
-      <td>${item.nome_hotel || '-'}</td>
-      <td>${formatCurrency(item.valor || 0)}</td>
-      <td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td>
-      <td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td>
-      <td>
-        <div class="action-buttons">
-          <button class="btn btn-primary" data-id="${item.id}" data-action="edit-b2c"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-danger" data-id="${item.id}" data-action="delete-b2c"><i class="fas fa-trash"></i></button>
-        </div>
-      </td>`;
+    row.innerHTML = `<td>${formatDateBR(item.data)}</td><td>${item.nome_hotel || '-'}</td><td>${formatCurrency(item.valor || 0)}</td><td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td><td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td><td><div class="action-buttons"><button class="btn btn-primary" data-id="${item.id}" data-action="edit-b2c"><i class="fas fa-edit"></i></button><button class="btn btn-danger" data-id="${item.id}" data-action="delete-b2c"><i class="fas fa-trash"></i></button></div></td>`;
     tbody.appendChild(row);
   });
   addTableActionListeners(tbody);
@@ -371,137 +307,54 @@ function delegatedClickHandler(e) {
     'edit-b2c': () => editB2c(id),
     'delete-b2c': () => deleteB2c(id),
   };
-  if (actions[action]) { actions[action](); }
+  if (actions[action]) actions[action]();
 }
 
 // ================== Gráficos (Chart.js) ==================
+function createOrUpdateChart(chartId, chartConfig) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) return;
+    const chartKey = chartId.replace('Chart', '');
+    if (charts[chartKey]) charts[chartKey].destroy();
+    charts[chartKey] = new Chart(canvas.getContext("2d"), chartConfig);
+}
+
 function updateLeadsCharts(dailyMetrics) {
-    const ctx = document.getElementById('leadsFunnelChart');
-    if (!ctx) return;
-    if (charts.leadsFunnel) charts.leadsFunnel.destroy();
     const days = Object.keys(dailyMetrics.dailyData || {});
     const lastDay = days.length > 0 ? days[days.length - 1] : null;
     const dataDay = lastDay ? dailyMetrics.dailyData[lastDay] : { askSuite: 0, filaAtendimento: 0, atendimento: 0, qualificacao: 0, oportunidade: 0, aguardandoPagamento: 0 };
     const funnelLabels = ['Ask Suite', 'Fila Atendimento', 'Atendimento', 'Qualificação', 'Oportunidade', 'Aguardando Pagamento'];
     const funnelValues = [ dataDay.askSuite, dataDay.filaAtendimento, dataDay.atendimento, dataDay.qualificacao, dataDay.oportunidade, dataDay.aguardandoPagamento ];
-    charts.leadsFunnel = new Chart(ctx.getContext('2d'), {
+    
+    createOrUpdateChart('leadsFunnelChart', {
       type: 'bar',
-      data: {
-        labels: funnelLabels,
-        datasets: [{ label: lastDay ? `Leads do dia ${formatDateBR(lastDay)}` : 'Nenhum dado no período', data: funnelValues, backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'], borderRadius: 5 }],
+      data: { 
+        labels: funnelLabels, 
+        datasets: [{ 
+          label: lastDay ? `Leads do dia ${formatDateBR(lastDay)}` : 'Nenhum dado no período', 
+          data: funnelValues, 
+          backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe'], 
+          borderRadius: 5 
+        }]
       },
       options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, title: { display: true, text: 'Funil de Leads (Dia Mais Recente)', font: { size: 16 }, padding: 15 }, tooltip: { callbacks: { label: (c) => `${c.label}: ${c.parsed.x} leads` } } },
-        scales: { x: { beginAtZero: true, title: { display: true, text: 'Quantidade' } }, y: { grid: { display: false } } }
+        indexAxis: 'y', 
+        responsive: true, 
+        maintainAspectRatio: false,
+        plugins: { 
+          legend: { display: false }, 
+          title: { display: true, text: 'Funil de Leads (Dia Mais Recente)', font: { size: 16 }, padding: 15 }, 
+          tooltip: { callbacks: { label: (c) => `${c.label}: ${c.parsed.x} leads` } } 
+        },
+        scales: { 
+          x: { beginAtZero: true, title: { display: true, text: 'Quantidade' } }, 
+          y: { grid: { display: false } } 
+        }
       }
     });
 }
 
-// ===================================================================
-//   ADICIONE ESTA NOVA FUNÇÃO ANTES DE 'updateB2cCharts'
-// ===================================================================
-
-function updateHotelComparisonChart(b2cData) {
-    const canvas = document.getElementById('hotelComparisonChart');
-    if (!canvas) return;
-
-    // 1. Agrupar vendas por hotel
-    const salesByHotel = {};
-    b2cData.forEach(item => {
-        if (!item.nome_hotel) return;
-        if (!salesByHotel[item.nome_hotel]) {
-            salesByHotel[item.nome_hotel] = {
-                totalValue: 0,
-                salesCount: 0,
-                couponCount: 0,
-                paymentMethods: {}
-            };
-        }
-        const hotel = salesByHotel[item.nome_hotel];
-        hotel.totalValue += Number(item.valor) || 0;
-        hotel.salesCount++;
-        if (item.usou_cupom) {
-            hotel.couponCount++;
-        }
-        const pm = item.forma_pagamento || 'Não Informado';
-        hotel.paymentMethods[pm] = (hotel.paymentMethods[pm] || 0) + 1;
-    });
-
-    // 2. Preparar dados para o gráfico
-    const hotelNames = Object.keys(salesByHotel);
-    const hotelTotalValues = hotelNames.map(name => salesByHotel[name].totalValue);
-
-    // 3. Destruir gráfico antigo e criar o novo
-    if (charts.hotelComparison) {
-        charts.hotelComparison.destroy();
-    }
-
-    charts.hotelComparison = new Chart(canvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: hotelNames,
-            datasets: [{
-                label: 'Valor Total Vendido (R$)',
-                data: hotelTotalValues,
-                backgroundColor: '#3498db',
-                borderColor: '#2980b9',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            indexAxis: 'x', // Gráfico de barras vertical
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: (value) => formatCurrency(value) }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        // Tooltip customizado com todas as informações
-                        title: function(context) {
-                            return context[0].label; // Nome do Hotel
-                        },
-                        label: function(context) {
-                            return `Valor Total: ${formatCurrency(context.parsed.y)}`;
-                        },
-                        afterLabel: function(context) {
-                            const hotelName = context.label;
-                            const hotelInfo = salesByHotel[hotelName];
-                            const payments = Object.entries(hotelInfo.paymentMethods)
-                                .map(([method, count]) => `${method}: ${count}`)
-                                .join(', ');
-
-                            return [
-                                `Total de Vendas: ${hotelInfo.salesCount}`,
-                                `Vendas com Cupom: ${hotelInfo.couponCount}`,
-                                `Formas de Pagamento: ${payments}`
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-
 function updateB2cCharts(b2cData, metrics) {
-    function createOrUpdateChart(chartId, chartConfig) {
-        const canvas = document.getElementById(chartId);
-        if (!canvas) return;
-        const chartKey = chartId.replace('Chart', '');
-        if (charts[chartKey]) {
-            charts[chartKey].destroy();
-        }
-        charts[chartKey] = new Chart(canvas.getContext("2d"), chartConfig);
-    }
-
     const topHoteisValor = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.valor_total - a.valor_total).slice(0, 5);
     createOrUpdateChart('topHoteisChart', {
         type: "doughnut",
@@ -521,21 +374,39 @@ function updateB2cCharts(b2cData, metrics) {
         options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
 
-    const vendasData = processTimelineData(b2cData, "data", "valor");
-    createOrUpdateChart('vendasTimelineChart', {
-        type: "line",
-        data: { labels: vendasData.labels, datasets: [{ label: "Vendas (R$)", data: vendasData.data, borderColor: "#4facfe", backgroundColor: "rgba(79, 172, 254, 0.1)", fill: true, tension: 0.4, }] },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } },
-            plugins: {
-                zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
-                }
-            }
-        }
-    });
+    if (metrics.forma_pagamento) {
+        createOrUpdateChart('formaPagamentoChart', {
+            type: 'doughnut',
+            data: {
+                labels: metrics.forma_pagamento.map(item => item.forma_pagamento),
+                datasets: [{
+                    label: 'Formas de Pagamento',
+                    data: metrics.forma_pagamento.map(item => item.quantidade),
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#f1c40f', '#9b59b6', '#1abc9c'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    if (metrics.cupom_stats) {
+        createOrUpdateChart('cupomChart', {
+            type: 'pie',
+            data: {
+                labels: ['Usou Cupom', 'Não Usou Cupom'],
+                datasets: [{
+                    label: 'Uso de Cupons',
+                    data: [metrics.cupom_stats['Sim'], metrics.cupom_stats['Não']],
+                    backgroundColor: ['#27ae60', '#c0392b'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+        });
+    }
 
     const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
     createOrUpdateChart('topHoteisQtdChart', {
@@ -588,6 +459,8 @@ function openModal(type, data = null) {
       form.data.value = formatDate(data.data);
       form.nome_hotel.value = data.nome_hotel || '';
       form.valor.value = data.valor || '';
+      form.forma_pagamento.value = data.forma_pagamento || 'Não Informado';
+      form.usou_cupom.value = data.usou_cupom ? 'true' : 'false';
       form.status.value = data.status || '';
       form.status_pagamento.value = data.status_pagamento || '';
     } else {
@@ -622,23 +495,17 @@ async function handleLeadSubmit(e) {
 async function handleB2cSubmit(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
-  
-  // Coleta todos os dados do formulário, incluindo os novos
   const data = {
     data: formData.get('data'),
     nome_hotel: formData.get('nome_hotel'),
     valor: parseFloat(formData.get('valor').replace(',', '.')) || 0,
+    forma_pagamento: formData.get('forma_pagamento'),
+    usou_cupom: formData.get('usou_cupom') === 'true',
     status: formData.get('status'),
     status_pagamento: formData.get('status_pagamento'),
-    // --- COLETA OS NOVOS DADOS ---
-    forma_pagamento: formData.get('forma_pagamento'),
-    // Converte o valor string 'true'/'false' para booleano
-    usou_cupom: formData.get('usou_cupom') === 'true' 
   };
-  
   await saveData('b2c', data, editingId);
 }
-
 
 async function saveData(type, data, id) {
   const endpoint = type === 'lead' ? 'leads' : 'b2c';
@@ -726,9 +593,6 @@ async function exportToPDF() {
       throw new Error(errData.error || 'Erro ao gerar o PDF.');
     }
     const blob = await resp.blob();
-    // ===================================================================
-//   COLE ESTE BLOCO NO FINAL DO SEU ARQUIVO SCRIPT.JS
-// ===================================================================
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.style.display = 'none';
@@ -784,18 +648,7 @@ function showToast(message, type = 'info') {
   }, 5000);
 }
 
-// ===================================================================
-//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
-// ===================================================================
-
-// ===================================================================
-//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
-// ===================================================================
-
-// ===================================================================
-//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
-// ===================================================================
-
+// ================== Lógica do Filtro de Hotel e Popup ==================
 function handleHotelSearch() {
     const searchInput = document.getElementById('hotelSearchInput');
     const searchTerm = searchInput.value.trim().toLowerCase();
@@ -817,15 +670,11 @@ function handleHotelSearch() {
         return;
     }
     
-    // --- CÁLCULO DOS TOTAIS (JÁ EXISTENTE) ---
     const totalRegistrosHotel = hotelData.length;
     const valorTotalHotel = hotelData.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
     
-    // Atualiza os cards principais da página
     document.getElementById('totalB2cRegistros').textContent = totalRegistrosHotel;
     document.getElementById('totalB2cValor').textContent = formatCurrency(valorTotalHotel);
-
-    // --- LÓGICA DO POPUP COM RESUMO E TABELA ---
 
     const chartZoomModal = document.getElementById('chartZoomModal');
     const chartZoomContainer = document.getElementById('chartZoomContainer');
@@ -834,64 +683,58 @@ function handleHotelSearch() {
     const hotelName = hotelData[0].nome_hotel;
     chartZoomTitle.innerText = `Detalhe de Vendas: ${hotelName}`;
 
-    // Destrói qualquer gráfico que possa existir no modal
     if (charts.zoomChart) {
         charts.zoomChart.destroy();
     }
 
-    // --- INÍCIO DA NOVA LÓGICA DE CONSTRUÇÃO DO HTML ---
-
-    // 1. Cria o cabeçalho de resumo
     let summaryHTML = `
         <div class="popup-summary">
-            <div class="summary-item">
-                <strong>Total de Vendas:</strong>
-                <span>${totalRegistrosHotel}</span>
-            </div>
-            <div class="summary-item">
-                <strong>Valor Total Vendido:</strong>
-                <span>${formatCurrency(valorTotalHotel)}</span>
-            </div>
+            <div class="summary-item"><strong>Total de Vendas:</strong><span>${totalRegistrosHotel}</span></div>
+            <div class="summary-item"><strong>Valor Total Vendido:</strong><span>${formatCurrency(valorTotalHotel)}</span></div>
         </div>
     `;
 
-    // 2. Cria a tabela de detalhes (código já existente)
     let tableHTML = `
-        <div class="table-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Data da Venda</th>
-                        <th>Valor</th>
-                        <th>Forma de Pagamento</th>
-                        <th>Usou Cupom?</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+        <div class="table-wrapper"><table class="data-table">
+            <thead><tr><th>Data da Venda</th><th>Valor</th><th>Forma de Pagamento</th><th>Usou Cupom?</th></tr></thead>
+            <tbody>`;
 
     hotelData.forEach(item => {
         const cupomText = item.usou_cupom ? 'Sim' : 'Não';
         const cupomClass = item.usou_cupom ? 'status-confirmado' : 'status-cancelado';
-        tableHTML += `
-            <tr>
-                <td>${formatDateBR(item.data)}</td>
-                <td>${formatCurrency(item.valor)}</td>
-                <td>${item.forma_pagamento || 'Não Informado'}</td>
-                <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
-            </tr>
-        `;
+        tableHTML += `<tr>
+            <td>${formatDateBR(item.data)}</td>
+            <td>${formatCurrency(item.valor)}</td>
+            <td>${item.forma_pagamento || 'Não Informado'}</td>
+            <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
+        </tr>`;
     });
 
-    tableHTML += `
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    // 3. Junta o resumo e a tabela e insere no modal
+    tableHTML += `</tbody></table></div>`;
     chartZoomContainer.innerHTML = summaryHTML + tableHTML;
+    chartZoomModal.classList.add('active');
+}
 
-    // Mostra o modal
+function openChartZoom(originalChart) {
+    const chartZoomModal = document.getElementById('chartZoomModal');
+    const chartZoomContainer = document.getElementById('chartZoomContainer');
+    const chartZoomTitle = document.getElementById('chartZoomTitle');
+
+    if (!originalChart) return;
+
+    chartZoomTitle.innerText = originalChart.options.plugins.title.text || 'Visualização do Gráfico';
+    
+    if (charts.zoomChart) {
+        charts.zoomChart.destroy();
+    }
+
+    chartZoomContainer.innerHTML = '<canvas id="zoomCanvas"></canvas>';
+    const zoomCanvas = document.getElementById('zoomCanvas');
+
+    charts.zoomChart = new Chart(zoomCanvas.getContext('2d'), {
+        type: originalChart.config.type,
+        data: originalChart.config.data,
+        options: { ...originalChart.config.options, maintainAspectRatio: false, responsive: true }
+    });
     chartZoomModal.classList.add('active');
 }
