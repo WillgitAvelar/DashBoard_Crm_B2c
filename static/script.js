@@ -275,19 +275,43 @@ function updateLeadsTable(leads) {
   addTableActionListeners(tbody);
 }
 
+// ================== Atualização da UI (Métricas e Tabelas) ==================
+// ... (outras funções de atualização) ...
+
 function updateB2cTable(b2cData) {
   const tbody = document.getElementById('b2cTableBody');
   if (!tbody) return;
+  
+  // ========================================================
+  //      ADICIONE APENAS ESTA LINHA DE CÓDIGO AQUI
+  // ========================================================
+  const sortedData = [...b2cData].sort((a, b) => new Date(b.data) - new Date(a.data));
+  // ========================================================
+
   tbody.innerHTML = '';
-  (b2cData || []).forEach(item => {
+  
+  // Altere a linha abaixo para usar a nova variável 'sortedData'
+  (sortedData || []).forEach(item => {
     const statusClass = (item.status || 'pendente').toLowerCase().replace(/\s+/g, '-');
     const pagClass = (item.status_pagamento || 'nao-informado').toLowerCase().replace(/\s+/g, '-');
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${formatDateBR(item.data)}</td><td>${item.nome_hotel || '-'}</td><td>${formatCurrency(item.valor || 0)}</td><td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td><td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td><td><div class="action-buttons"><button class="btn btn-primary" data-id="${item.id}" data-action="edit-b2c"><i class="fas fa-edit"></i></button><button class="btn btn-danger" data-id="${item.id}" data-action="delete-b2c"><i class="fas fa-trash"></i></button></div></td>`;
+    row.innerHTML = `
+      <td>${formatDateBR(item.data)}</td>
+      <td>${item.nome_hotel || '-'}</td>
+      <td>${formatCurrency(item.valor || 0)}</td>
+      <td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td>
+      <td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn btn-primary" data-id="${item.id}" data-action="edit-b2c"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger" data-id="${item.id}" data-action="delete-b2c"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>`;
     tbody.appendChild(row);
   });
   addTableActionListeners(tbody);
 }
+
 
 function addTableActionListeners(tbody) {
     tbody.querySelectorAll('button[data-action]').forEach(btn => {
