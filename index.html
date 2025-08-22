@@ -88,8 +88,29 @@
                 </div>
 
                 <div class="section-header"><h3>Lista B2C</h3><button class="btn btn-secondary" id="toggleB2cBtn">👁️ Mostrar/Esconder</button></div>
-                <div class="table-container" id="b2cTableContainer" style="display:none;"><div class="table-wrapper"><table class="data-table" id="b2cTable"><thead><tr><th>Data</th><th>Hotel</th><th>Valor</th><th>Status</th><th>Status Pagamento</th><th>Ações</th></tr></thead><tbody id="b2cTableBody"></tbody></table></div></div>
-            </div>
+<!-- Dentro do seu index.html -->
+<table class="data-table" id="b2cTable">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Hotel</th>
+            <th>Valor</th>
+            <!-- ======================================================== -->
+            <!--      NOVOS CABEÇALHOS ADICIONADOS AQUI               -->
+            <!-- ======================================================== -->
+            <th>Forma de Pagamento</th>
+            <th>Usou Cupom?</th>
+            <!-- ======================================================== -->
+            <th>Status</th>
+            <th>Status Pagamento</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody id="b2cTableBody">
+        <!-- Dados inseridos via JavaScript -->
+    </tbody>
+</table>
+
         </main>
     </div>
     

@@ -278,27 +278,51 @@ function updateLeadsTable(leads) {
 // ================== Atualização da UI (Métricas e Tabelas) ==================
 // ... (outras funções de atualização) ...
 
+// ===================================================================
+//   SUBSTITUA SUA FUNÇÃO 'updateB2cTable' PELA VERSÃO ABAIXO
+// ===================================================================
+
+// ===================================================================
+//   SUBSTITUA SUA FUNÇÃO 'updateB2cTable' PELA VERSÃO ABAIXO
+// ===================================================================
+
 function updateB2cTable(b2cData) {
   const tbody = document.getElementById('b2cTableBody');
   if (!tbody) return;
   
-  // ========================================================
-  //      ADICIONE APENAS ESTA LINHA DE CÓDIGO AQUI
-  // ========================================================
+  // Ordena os dados pela data mais recente
   const sortedData = [...b2cData].sort((a, b) => new Date(b.data) - new Date(a.data));
-  // ========================================================
-
-  tbody.innerHTML = '';
   
-  // Altere a linha abaixo para usar a nova variável 'sortedData'
+  tbody.innerHTML = ''; // Limpa a tabela antiga
+  
+  // Itera sobre os dados ordenados para criar as novas linhas
   (sortedData || []).forEach(item => {
+    const row = document.createElement('tr');
+
+    // --- LÓGICA PARA EXIBIR O TEXTO E A COR DO CUPOM ---
+    const cupomText = item.usou_cupom ? 'Sim' : 'Não';
+    // Define uma classe CSS para colorir o 'Sim' de verde e o 'Não' de vermelho
+    const cupomClass = item.usou_cupom ? 'status-confirmado' : 'status-cancelado';
+    // ----------------------------------------------------
+
+    // --- LÓGICA PARA AS CLASSES DE STATUS ---
     const statusClass = (item.status || 'pendente').toLowerCase().replace(/\s+/g, '-');
     const pagClass = (item.status_pagamento || 'nao-informado').toLowerCase().replace(/\s+/g, '-');
-    const row = document.createElement('tr');
+    // ----------------------------------------
+
+    // Constrói o HTML da linha com TODAS as colunas corretas
     row.innerHTML = `
       <td>${formatDateBR(item.data)}</td>
       <td>${item.nome_hotel || '-'}</td>
       <td>${formatCurrency(item.valor || 0)}</td>
+      
+      <!-- ======================================================== -->
+      <!--      CÉLULAS CORRIGIDAS PARA USAR OS DADOS CERTOS      -->
+      <!-- ======================================================== -->
+      <td>${item.forma_pagamento || 'Não Informado'}</td>
+      <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
+      <!-- ======================================================== -->
+
       <td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td>
       <td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td>
       <td>
@@ -307,10 +331,13 @@ function updateB2cTable(b2cData) {
           <button class="btn btn-danger" data-id="${item.id}" data-action="delete-b2c"><i class="fas fa-trash"></i></button>
         </div>
       </td>`;
+      
     tbody.appendChild(row);
   });
+  
   addTableActionListeners(tbody);
 }
+
 
 
 function addTableActionListeners(tbody) {
@@ -458,14 +485,20 @@ function processTimelineData(data, dateField, valueField = null) {
 }
 
 // ================== Modais (Adicionar/Editar) ==================
+// ===================================================================
+//   SUBSTITUA SUA FUNÇÃO 'openModal' PELA VERSÃO ABAIXO
+// ===================================================================
+
 function openModal(type, data = null) {
   editingId = data ? data.id : null;
   const modalId = `${type}Modal`;
   const modal = document.getElementById(modalId);
   if (!modal) return;
+  
   document.getElementById(`${type}ModalTitle`).textContent = data ? `Editar ${type.toUpperCase()}` : `Adicionar ${type.toUpperCase()}`;
   const form = document.getElementById(`${type}Form`);
   form.reset();
+
   if (type === 'lead') {
     if (data) {
       form.data_entrada.value = formatDate(data.data_entrada);
@@ -480,15 +513,30 @@ function openModal(type, data = null) {
     }
   } else if (type === 'b2c') {
     if (data) {
+      // --- LÓGICA ANTIGA (JÁ EXISTENTE) ---
       form.data.value = formatDate(data.data);
       form.nome_hotel.value = data.nome_hotel || '';
       form.valor.value = data.valor || '';
-      form.forma_pagamento.value = data.forma_pagamento || 'Não Informado';
-      form.usou_cupom.value = data.usou_cupom ? 'true' : 'false';
       form.status.value = data.status || '';
       form.status_pagamento.value = data.status_pagamento || '';
+
+      // ========================================================
+      //      INÍCIO DAS LINHAS ADICIONADAS PARA CORREÇÃO
+      // ========================================================
+      // Preenche o campo 'Forma de Pagamento' com o valor salvo, ou 'Não Informado' se não houver.
+      form.forma_pagamento.value = data.forma_pagamento || 'Não Informado';
+      
+      // Preenche o campo 'Usou Cupom' convertendo o booleano (true/false) para string.
+      form.usou_cupom.value = data.usou_cupom ? 'true' : 'false';
+      // ========================================================
+      //        FIM DAS LINHAS ADICIONADAS PARA CORREÇÃO
+      // ========================================================
+
     } else {
+      // Define os valores padrão para um novo registro
       form.data.value = formatDate(new Date());
+      form.forma_pagamento.value = 'Não Informado';
+      form.usou_cupom.value = 'false';
     }
   }
   modal.classList.add('active');
@@ -515,21 +563,32 @@ async function handleLeadSubmit(e) {
   };
   await saveData('lead', data, editingId);
 }
+// ===================================================================
+//   SUBSTITUA SUA FUNÇÃO 'handleB2cSubmit' PELA VERSÃO ABAIXO
+// ===================================================================
 
 async function handleB2cSubmit(e) {
-  e.preventDefault();
+  e.preventDefault(); // Impede o recarregamento da página
   const formData = new FormData(e.target);
+  
+  // Coleta todos os dados do formulário, incluindo os novos
   const data = {
     data: formData.get('data'),
     nome_hotel: formData.get('nome_hotel'),
     valor: parseFloat(formData.get('valor').replace(',', '.')) || 0,
-    forma_pagamento: formData.get('forma_pagamento'),
-    usou_cupom: formData.get('usou_cupom') === 'true',
     status: formData.get('status'),
     status_pagamento: formData.get('status_pagamento'),
+    
+    // --- COLETA OS NOVOS DADOS DO FORMULÁRIO ---
+    forma_pagamento: formData.get('forma_pagamento'),
+    // Converte o valor de texto 'true'/'false' para um booleano real
+    usou_cupom: formData.get('usou_cupom') === 'true' 
   };
+  
+  // Chama a função genérica para salvar os dados
   await saveData('b2c', data, editingId);
 }
+
 
 async function saveData(type, data, id) {
   const endpoint = type === 'lead' ? 'leads' : 'b2c';
