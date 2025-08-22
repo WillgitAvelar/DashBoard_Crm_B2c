@@ -203,13 +203,21 @@ async function loadB2cData() {
   const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
   const resp = await fetch(`/api/b2c?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados B2C');
+  
   const data = await resp.json();
   allB2cData = data || [];
+  
   const metrics = calculateB2cMetrics(allB2cData);
   updateB2cMetrics(metrics);
   updateB2cTable(allB2cData);
   updateB2cCharts(allB2cData, metrics);
+  
+  // ========================================================
+  //   ADICIONE APENAS ESTA LINHA DE CÓDIGO NO FINAL
+  // ========================================================
+  updateHotelComparisonChart(allB2cData);
 }
+
 
 // ================== Cálculo de Métricas ==================
 function calculateLeadsMetrics(leads) {
@@ -390,6 +398,99 @@ function updateLeadsCharts(dailyMetrics) {
     });
 }
 
+// ===================================================================
+//   ADICIONE ESTA NOVA FUNÇÃO ANTES DE 'updateB2cCharts'
+// ===================================================================
+
+function updateHotelComparisonChart(b2cData) {
+    const canvas = document.getElementById('hotelComparisonChart');
+    if (!canvas) return;
+
+    // 1. Agrupar vendas por hotel
+    const salesByHotel = {};
+    b2cData.forEach(item => {
+        if (!item.nome_hotel) return;
+        if (!salesByHotel[item.nome_hotel]) {
+            salesByHotel[item.nome_hotel] = {
+                totalValue: 0,
+                salesCount: 0,
+                couponCount: 0,
+                paymentMethods: {}
+            };
+        }
+        const hotel = salesByHotel[item.nome_hotel];
+        hotel.totalValue += Number(item.valor) || 0;
+        hotel.salesCount++;
+        if (item.usou_cupom) {
+            hotel.couponCount++;
+        }
+        const pm = item.forma_pagamento || 'Não Informado';
+        hotel.paymentMethods[pm] = (hotel.paymentMethods[pm] || 0) + 1;
+    });
+
+    // 2. Preparar dados para o gráfico
+    const hotelNames = Object.keys(salesByHotel);
+    const hotelTotalValues = hotelNames.map(name => salesByHotel[name].totalValue);
+
+    // 3. Destruir gráfico antigo e criar o novo
+    if (charts.hotelComparison) {
+        charts.hotelComparison.destroy();
+    }
+
+    charts.hotelComparison = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: hotelNames,
+            datasets: [{
+                label: 'Valor Total Vendido (R$)',
+                data: hotelTotalValues,
+                backgroundColor: '#3498db',
+                borderColor: '#2980b9',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            indexAxis: 'x', // Gráfico de barras vertical
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { callback: (value) => formatCurrency(value) }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        // Tooltip customizado com todas as informações
+                        title: function(context) {
+                            return context[0].label; // Nome do Hotel
+                        },
+                        label: function(context) {
+                            return `Valor Total: ${formatCurrency(context.parsed.y)}`;
+                        },
+                        afterLabel: function(context) {
+                            const hotelName = context.label;
+                            const hotelInfo = salesByHotel[hotelName];
+                            const payments = Object.entries(hotelInfo.paymentMethods)
+                                .map(([method, count]) => `${method}: ${count}`)
+                                .join(', ');
+
+                            return [
+                                `Total de Vendas: ${hotelInfo.salesCount}`,
+                                `Vendas com Cupom: ${hotelInfo.couponCount}`,
+                                `Formas de Pagamento: ${payments}`
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
 function updateB2cCharts(b2cData, metrics) {
     function createOrUpdateChart(chartId, chartConfig) {
         const canvas = document.getElementById(chartId);
@@ -521,15 +622,23 @@ async function handleLeadSubmit(e) {
 async function handleB2cSubmit(e) {
   e.preventDefault();
   const formData = new FormData(e.target);
+  
+  // Coleta todos os dados do formulário, incluindo os novos
   const data = {
     data: formData.get('data'),
     nome_hotel: formData.get('nome_hotel'),
     valor: parseFloat(formData.get('valor').replace(',', '.')) || 0,
     status: formData.get('status'),
     status_pagamento: formData.get('status_pagamento'),
+    // --- COLETA OS NOVOS DADOS ---
+    forma_pagamento: formData.get('forma_pagamento'),
+    // Converte o valor string 'true'/'false' para booleano
+    usou_cupom: formData.get('usou_cupom') === 'true' 
   };
+  
   await saveData('b2c', data, editingId);
 }
+
 
 async function saveData(type, data, id) {
   const endpoint = type === 'lead' ? 'leads' : 'b2c';
@@ -675,20 +784,25 @@ function showToast(message, type = 'info') {
   }, 5000);
 }
 
-// ================== Lógica do Filtro de Hotel ==================
-// Esta função é chamada pelos event listeners configurados em setupEventListeners
+// ===================================================================
+//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
+// ===================================================================
+
+// ===================================================================
+//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
+// ===================================================================
+
+// ===================================================================
+//   SUBSTITUA A FUNÇÃO 'handleHotelSearch' PELA VERSÃO COMPLETA ABAIXO
+// ===================================================================
+
 function handleHotelSearch() {
     const searchInput = document.getElementById('hotelSearchInput');
     const searchTerm = searchInput.value.trim().toLowerCase();
-    const chartContainer = document.getElementById('hotelSpecificChartContainer');
-    const chartTitle = document.getElementById('hotelSpecificChartTitle');
-    const metricsContainer = document.getElementById('hotelSpecificMetricsContainer');
-    const totalVendasEl = document.getElementById('hotelTotalVendas');
 
     if (!searchTerm) {
-        chartContainer.style.display = 'none';
-        metricsContainer.style.display = 'none';
-        if (charts.hotelSpecific) charts.hotelSpecific.destroy();
+        const originalMetrics = calculateB2cMetrics(allB2cData);
+        updateB2cMetrics(originalMetrics);
         return;
     }
 
@@ -698,44 +812,86 @@ function handleHotelSearch() {
 
     if (hotelData.length === 0) {
         showToast(`Nenhum hotel encontrado para "${searchInput.value}"`, 'warning');
-        chartContainer.style.display = 'none';
-        metricsContainer.style.display = 'none';
+        const originalMetrics = calculateB2cMetrics(allB2cData);
+        updateB2cMetrics(originalMetrics);
         return;
     }
     
-    const totalVendas = hotelData.length;
-    totalVendasEl.innerText = totalVendas;
-
-    const hotelName = hotelData[0].nome_hotel;
-    chartTitle.innerText = `Vendas para: ${hotelName}`;
-
-    const timelineData = processTimelineData(hotelData, 'data', 'valor');
-
-    const canvas = document.getElementById('hotelSpecificChart');
-    if (charts.hotelSpecific) charts.hotelSpecific.destroy();
+    // --- CÁLCULO DOS TOTAIS (JÁ EXISTENTE) ---
+    const totalRegistrosHotel = hotelData.length;
+    const valorTotalHotel = hotelData.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
     
-    charts.hotelSpecific = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: timelineData.labels,
-            datasets: [{
-                label: `Vendas (R$) para ${hotelName}`,
-                data: timelineData.data,
-                borderColor: '#8e44ad',
-                backgroundColor: 'rgba(142, 68, 173, 0.1)',
-                fill: true,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: { y: { beginAtZero: true, ticks: { callback: (v) => formatCurrency(v) } } },
-            plugins: { title: { display: true, text: `Timeline de Vendas - ${hotelName}` } }
-        }
+    // Atualiza os cards principais da página
+    document.getElementById('totalB2cRegistros').textContent = totalRegistrosHotel;
+    document.getElementById('totalB2cValor').textContent = formatCurrency(valorTotalHotel);
+
+    // --- LÓGICA DO POPUP COM RESUMO E TABELA ---
+
+    const chartZoomModal = document.getElementById('chartZoomModal');
+    const chartZoomContainer = document.getElementById('chartZoomContainer');
+    const chartZoomTitle = document.getElementById('chartZoomTitle');
+    
+    const hotelName = hotelData[0].nome_hotel;
+    chartZoomTitle.innerText = `Detalhe de Vendas: ${hotelName}`;
+
+    // Destrói qualquer gráfico que possa existir no modal
+    if (charts.zoomChart) {
+        charts.zoomChart.destroy();
+    }
+
+    // --- INÍCIO DA NOVA LÓGICA DE CONSTRUÇÃO DO HTML ---
+
+    // 1. Cria o cabeçalho de resumo
+    let summaryHTML = `
+        <div class="popup-summary">
+            <div class="summary-item">
+                <strong>Total de Vendas:</strong>
+                <span>${totalRegistrosHotel}</span>
+            </div>
+            <div class="summary-item">
+                <strong>Valor Total Vendido:</strong>
+                <span>${formatCurrency(valorTotalHotel)}</span>
+            </div>
+        </div>
+    `;
+
+    // 2. Cria a tabela de detalhes (código já existente)
+    let tableHTML = `
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Data da Venda</th>
+                        <th>Valor</th>
+                        <th>Forma de Pagamento</th>
+                        <th>Usou Cupom?</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    hotelData.forEach(item => {
+        const cupomText = item.usou_cupom ? 'Sim' : 'Não';
+        const cupomClass = item.usou_cupom ? 'status-confirmado' : 'status-cancelado';
+        tableHTML += `
+            <tr>
+                <td>${formatDateBR(item.data)}</td>
+                <td>${formatCurrency(item.valor)}</td>
+                <td>${item.forma_pagamento || 'Não Informado'}</td>
+                <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
+            </tr>
+        `;
     });
 
-    metricsContainer.style.display = 'grid';
-    chartContainer.style.display = 'block';
-}
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
 
+    // 3. Junta o resumo e a tabela e insere no modal
+    chartZoomContainer.innerHTML = summaryHTML + tableHTML;
+
+    // Mostra o modal
+    chartZoomModal.classList.add('active');
+}

@@ -757,3 +757,34 @@ form {
 #hotelSpecificChartContainer {
     margin-top: 20px;
 }
+/* =================================== */
+/*      ESTILOS PARA O RESUMO DO POPUP   */
+/* =================================== */
+
+.popup-summary {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa; /* Um cinza bem claro */
+    border-bottom: 1px solid #dee2e6; /* Linha de separação */
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 14px;
+    color: #6c757d; /* Cinza escuro */
+    margin-bottom: 5px;
+}
+
+.summary-item span {
+    font-size: 20px;
+    font-weight: bold;
+    color: #343a40; /* Preto suave */
+}

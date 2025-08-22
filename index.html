@@ -93,12 +93,25 @@
                 </div>
 
                 <!-- Leads Charts -->
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Funil de Conversão</h3>
-                        <canvas id="leadsFunnelChart"></canvas>
-                    </div>
-                </div>
+           <!-- DENTRO DA SEÇÃO B2C, ENCONTRE A GRADE DE GRÁFICOS -->
+<div class="charts-grid">
+    <!-- ... outros gráficos como Top 5, Status, etc. ... -->
+    <div class="chart-container">
+        <h3>Top 5 Hotéis por Quantidade Vendida</h3>
+        <canvas id="topHoteisQtdChart"></canvas>
+    </div>
+
+    <!-- ======================================================== -->
+    <!--      ADICIONE O NOVO GRÁFICO COMPARATIVO AQUI          -->
+    <!-- ======================================================== -->
+    <div class="chart-container chart-container-large">
+        <h3>Comparativo de Vendas por Hotel</h3>
+        <canvas id="hotelComparisonChart"></canvas>
+    </div>
+    <!-- ======================================================== -->
+
+</div>
+
              
                 <!-- Leads Table Section -->
                 <div class="section-header">
@@ -149,15 +162,30 @@
     <h2>Análise por Hotel</h2>
 </div>
 <div class="hotel-filter-container">
-    <!-- ======================================================== -->
-<!--      INÍCIO DA SEÇÃO DE FILTRO POR HOTEL (HTML)        -->
 <!-- ======================================================== -->
-<div class="section-header">
-    <h2>Análise por Hotel</h2>
+<!--    APAGUE COMPLETAMENTE ESTE BLOCO DE CÓDIGO DO SEU HTML -->
+<!-- ======================================================== -->
+<div class="metrics-grid" id="hotelSpecificMetricsContainer" style="display: none;">
+    <div class="metric-card">
+        <div class="metric-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="metric-content">
+            <h3 id="hotelTotalVendas">0</h3>
+            <p>Total de Vendas</p>
+        </div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="metric-content">
+            <h3 id="hotelValorTotalVendido">R$ 0,00</h3>
+            <p>Valor Total Vendido</p>
+        </div>
+    </div>
 </div>
-<div class="hotel-filter-container">
-    <!-- ... seu campo de busca e botão ... -->
-</div>
+
 
 <!-- ======================================================== -->
 <!--    ADICIONE O NOVO CARD DE MÉTRICA AQUI ABAIXO         -->
@@ -266,20 +294,79 @@
         </div>
     </div>
 
-    <!-- B2C Modal -->
-    <div class="modal" id="b2cModal">
-        <div class="modal-content">
-            <div class="modal-header"><h3 id="b2cModalTitle">Adicionar B2C</h3><button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button></div>
-            <form id="b2cForm">
-                <div class="form-group"><label for="b2cData">Data:</label><input type="date" id="b2cData" name="data" required></div>
-                <div class="form-group"><label for="b2cNomeHotel">Nome do Hotel:</label><input type="text" id="b2cNomeHotel" name="nome_hotel" required></div>
-                <div class="form-group"><label for="b2cValor">Valor:</label><input type="number" id="b2cValor" name="valor" step="0.01" required></div>
-                <div class="form-group"><label for="b2cStatus">Status:</label><select id="b2cStatus" name="status" required><option value="">Selecione...</option><option value="Ativo">Ativo</option><option value="Pendente">Pendente</option><option value="Cancelado">Cancelado</option><option value="Confirmado">Confirmado</option></select></div>
-                <div class="form-group"><label for="b2cStatusPagamento">Status de Pagamento:</label><select id="b2cStatusPagamento" name="status_pagamento" required><option value="">Selecione...</option><option value="Pago">Pago</option><option value="Pendente">Pendente</option><option value="Atrasado">Atrasado</option><option value="Cancelado">Cancelado</option></select></div>
-                <div class="form-actions"><button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
-            </form>
+   <div class="modal" id="b2cModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="b2cModalTitle">Adicionar B2C</h3>
+            <button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button>
         </div>
+        <form id="b2cForm">
+            <div class="form-group">
+                <label for="b2cData">Data:</label>
+                <input type="date" id="b2cData" name="data" required>
+            </div>
+            <div class="form-group">
+                <label for="b2cNomeHotel">Nome do Hotel:</label>
+                <input type="text" id="b2cNomeHotel" name="nome_hotel" required>
+            </div>
+            <div class="form-group">
+                <label for="b2cValor">Valor:</label>
+                <input type="number" id="b2cValor" name="valor" step="0.01" required>
+            </div>
+
+            <!-- ======================================================== -->
+            <!--      INÍCIO DOS NOVOS CAMPOS ADICIONADOS               -->
+            <!-- ======================================================== -->
+            <div class="form-group">
+                <label for="b2cFormaPagamento">Forma de Pagamento:</label>
+                <select id="b2cFormaPagamento" name="forma_pagamento" required>
+                    <option value="Não Informado">Selecione...</option>
+                    <option value="Crédito">Crédito</option>
+                    <option value="Débito">Débito</option>
+                    <option value="Boleto">Boleto</option>
+                    <option value="Depósito Bancário">Depósito Bancário</option>
+                    <option value="Faturado">Faturado</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="b2cUsouCupom">Usou Cupom de Desconto?</label>
+                <select id="b2cUsouCupom" name="usou_cupom" required>
+                    <option value="false">Não</option>
+                    <option value="true">Sim</option>
+                </select>
+            </div>
+            <!-- ======================================================== -->
+            <!--        FIM DOS NOVOS CAMPOS ADICIONADOS                -->
+            <!-- ======================================================== -->
+
+            <div class="form-group">
+                <label for="b2cStatus">Status:</label>
+                <select id="b2cStatus" name="status" required>
+                    <option value="">Selecione...</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Cancelado">Cancelado</option>
+                    <option value="Confirmado">Confirmado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="b2cStatusPagamento">Status de Pagamento:</label>
+                <select id="b2cStatusPagamento" name="status_pagamento" required>
+                    <option value="">Selecione...</option>
+                    <option value="Pago">Pago</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Atrasado">Atrasado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i><p>Carregando...</p></div></div>
