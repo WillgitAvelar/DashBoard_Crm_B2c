@@ -425,6 +425,12 @@ function updateB2cCharts(b2cData, metrics) {
         options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
 
+    createOrUpdateChart('cupomChart', {
+        type: "pie",
+        data: { labels: ["Não", "Sim"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#f44336", "#4caf50"], borderColor: '#ffffff', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
+    });
+    
     if (metrics.forma_pagamento) {
         createOrUpdateChart('formaPagamentoChart', {
             type: 'doughnut',
@@ -442,23 +448,7 @@ function updateB2cCharts(b2cData, metrics) {
         });
     }
 
-    if (metrics.cupom_stats) {
-        createOrUpdateChart('cupomChart', {
-            type: 'pie',
-            data: {
-                labels: ['Usou Cupom', 'Não Usou Cupom'],
-                datasets: [{
-                    label: 'Uso de Cupons',
-                    data: [metrics.cupom_stats['Sim'], metrics.cupom_stats['Não']],
-                    backgroundColor: ['#27ae60', '#c0392b'],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
-        });
-    }
-
+   
     const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
     createOrUpdateChart('topHoteisQtdChart', {
         type: "bar",
