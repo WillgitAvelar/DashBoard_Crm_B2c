@@ -12,6 +12,8 @@ class B2C(Base):
     valor = Column(Float, nullable=False)
     status = Column(String(50), nullable=False)
     status_pagamento = Column(String(50), nullable=False)
+    forma_pagamento = Column(String(50), nullable=False)
+    usou_cupom = Column(String(10), nullable=False)
 
 engine = create_engine('sqlite:///instance/project.db')
 Session = sessionmaker(bind=engine)

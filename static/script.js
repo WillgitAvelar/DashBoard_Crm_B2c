@@ -1,12 +1,12 @@
-// ===================================================================
-//   SCRIPT.JS - VERSÃO FINAL COMPLETA E CORRIGIDA
-// ===================================================================
-
 let currentTab = 'leads';
-let currentFilters = { dataInicio: '', dataFim: '' };
+let currentFilters = { 
+  dataInicio: '', 
+  dataFim: '',
+  hotelSearch: '' // Adicionado para centralizar o filtro de hotel
+};
 let charts = {};
 let editingId = null;
-let allB2cData = [];
+let allB2cData = []; // Mantido para a busca por hotel no frontend, se preferir
 
 // ================== Inicialização Principal ==================
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,7 +23,7 @@ function formatDate(d) {
 }
 
 function formatDateBR(dateString) {
-  if (!dateString) return '-';
+  if (!dateString || dateString.includes('Invalid')) return 'Data Inválida';
   const date = new Date(dateString + 'T00:00:00');
   return date.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
 }
@@ -51,6 +51,7 @@ function setupEventListeners() {
   document.getElementById('cancelB2cBtn')?.addEventListener('click', () => closeModal('b2c'));
   document.getElementById('leadForm')?.addEventListener('submit', handleLeadSubmit);
   document.getElementById('b2cForm')?.addEventListener('submit', handleB2cSubmit);
+  
   document.getElementById('toggleLeadsBtn')?.addEventListener('click', () => {
     const container = document.getElementById('leadsTableContainer');
     if(container) container.style.display = container.style.display === 'none' ? 'block' : 'none';
@@ -74,8 +75,8 @@ function setupEventListeners() {
 
   const hotelSearchBtn = document.getElementById('hotelSearchBtn');
   const hotelSearchInput = document.getElementById('hotelSearchInput');
-  hotelSearchBtn?.addEventListener('click', handleHotelSearch);
-  hotelSearchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleHotelSearch(); });
+  hotelSearchBtn?.addEventListener('click', applyFilters); // AJUSTE: Botão de busca agora chama a função principal de filtros
+  hotelSearchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilters(); });
 }
 
 // ================== Navegação e Filtros ==================
@@ -95,27 +96,36 @@ function setDefaultDates() {
   const fimInput = document.getElementById('dataFim');
   if (inicioInput) inicioInput.value = formatDate(firstDayOfYear);
   if (fimInput) fimInput.value = formatDate(today);
+  
+  // Limpa o campo de busca de hotel
+  const hotelSearchInput = document.getElementById('hotelSearchInput');
+  if (hotelSearchInput) hotelSearchInput.value = '';
+
+  // Atualiza o objeto de filtros globais
   currentFilters.dataInicio = inicioInput?.value || '';
   currentFilters.dataFim = fimInput?.value || '';
+  currentFilters.hotelSearch = '';
 }
 
 function applyFilters() {
   const dataInicio = document.getElementById('dataInicio').value;
   const dataFim = document.getElementById('dataFim').value;
+  const hotelSearch = document.getElementById('hotelSearchInput').value;
+
   if (dataInicio && dataFim && dataInicio > dataFim) {
     showToast('Data de início não pode ser maior que a data de fim.', 'error');
     return;
   }
   currentFilters.dataInicio = dataInicio;
   currentFilters.dataFim = dataFim;
-  loadData();
+  currentFilters.hotelSearch = hotelSearch; // Armazena o termo de busca do hotel
+
+  loadData(); // Recarrega os dados com todos os filtros aplicados
   showToast('Filtros aplicados com sucesso!', 'success');
 }
 
 function clearFilters() {
-  document.getElementById('dataInicio').value = '';
-  document.getElementById('dataFim').value = '';
-  setDefaultDates();
+  setDefaultDates(); // Reseta as datas e o campo de busca
   loadData();
   showToast('Filtros limpos.', 'info');
 }
@@ -124,8 +134,11 @@ function clearFilters() {
 async function loadData() {
   showLoading(true);
   try {
-    if (currentTab === 'leads') await loadLeadsData();
-    else await loadB2cData();
+    if (currentTab === 'leads') {
+      await loadLeadsData();
+    } else {
+      await loadB2cData();
+    }
   } catch (err) {
     console.error('Erro ao carregar dados:', err);
     showToast('Falha ao carregar dados. Verifique o console.', 'error');
@@ -135,26 +148,38 @@ async function loadData() {
 }
 
 async function loadLeadsData() {
-  const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
+  const params = new URLSearchParams({ 
+    data_inicio: currentFilters.dataInicio, 
+    data_fim: currentFilters.dataFim 
+  });
   const resp = await fetch(`/api/leads?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados de Leads');
   const leads = await resp.json();
   updateLeadsMetrics(calculateLeadsMetrics(leads));
-  updateLeadsTable(leads || []);
+  updateLeadsTable(leads);
   updateLeadsCharts(calculateDailyLeadsMetrics(leads));
 }
 
 async function loadB2cData() {
-  const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim });
+  const params = new URLSearchParams({ 
+    data_inicio: currentFilters.dataInicio, 
+    data_fim: currentFilters.dataFim,
+    hotel: currentFilters.hotelSearch // Envia o termo de busca do hotel para o backend
+  });
   const resp = await fetch(`/api/b2c?${params}`);
   if (!resp.ok) throw new Error('Erro ao buscar dados B2C');
   const data = await resp.json();
-  allB2cData = data || [];
-  const metrics = calculateB2cMetrics(allB2cData);
+  
+  // Não precisamos mais da variável 'allB2cData', pois o backend já envia os dados filtrados
+  const metrics = calculateB2cMetrics(data);
   updateB2cMetrics(metrics);
-  updateB2cTable(allB2cData);
-  updateB2cCharts(allB2cData, metrics);
+  updateB2cTable(data);
+  updateB2cCharts(data, metrics);
 }
+
+// ================== Seções de Cálculo de Métricas, Atualização da UI, Gráficos, Modais e CRUD ==================
+// NENHUMA MUDANÇA NECESSÁRIA A PARTIR DAQUI. O CÓDIGO ABAIXO JÁ ESTÁ CORRETO.
+// ... (cole aqui todo o resto do seu arquivo script.js, desde a função calculateLeadsMetrics até o final) ...
 
 // ================== Cálculo de Métricas ==================
 function calculateLeadsMetrics(leads) {
@@ -201,9 +226,7 @@ function calculateB2cMetrics(data) {
   const metrics = { 
     total_registros: 0, 
     total_valor: 0, 
-    total_confirmados: 0, 
-    total_pendentes: 0, 
-    total_cancelados: 0, 
+    status_stats: { 'Confirmado': 0, 'Pendente': 0, 'Cancelado': 0, 'Negado': 0, 'Reservado': 0 },
     hoteis_stats: {}, 
     status_pagamento_stats: {},
     forma_pagamento_stats: {},
@@ -216,11 +239,11 @@ function calculateB2cMetrics(data) {
     metrics.total_registros++;
     metrics.total_valor += Number(item.valor) || 0;
     
-    const status = (item.status || 'pendente').toLowerCase();
-    if (status === 'confirmado' || status === 'ativo') metrics.total_confirmados++;
-    else if (status === 'cancelado') metrics.total_cancelados++;
-    else if (status === 'pendente') metrics.total_pendentes++;
-    
+    const status = item.status || 'Pendente';
+    if (metrics.status_stats.hasOwnProperty(status)) {
+        metrics.status_stats[status]++;
+    }
+
     const statusPag = item.status_pagamento || 'Não Informado';
     metrics.status_pagamento_stats[statusPag] = (metrics.status_pagamento_stats[statusPag] || 0) + 1;
 
@@ -247,6 +270,7 @@ function calculateB2cMetrics(data) {
   return metrics;
 }
 
+
 // ================== Atualização da UI (Métricas e Tabelas) ==================
 function updateLeadsMetrics(metrics) {
   document.getElementById('totalLeads').textContent = metrics.totalLeads || 0;
@@ -265,64 +289,64 @@ function updateB2cMetrics(metrics) {
 
 function updateLeadsTable(leads) {
   const tbody = document.getElementById('leadsTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  (leads || []).forEach(lead => {
+  if (!tbody) {
+    console.error('Elemento #leadsTableBody não encontrado no HTML.');
+    return;
+  }
+
+  tbody.innerHTML = ''; 
+
+  if (!Array.isArray(leads)) {
+    console.error("Dados de leads inválidos. Esperava um array.", leads);
+    return;
+  }
+
+  leads.forEach(lead => {
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${formatDateBR(lead.data_entrada)}</td><td>${lead.entrada_leads_ask_suite || '-'}</td><td>${lead.fila_atendimento || '-'}</td><td>${lead.atendimento || '-'}</td><td>${lead.qualificacao || '-'}</td><td>${lead.oportunidade || '-'}</td><td>${lead.aguardando_pagamento || '-'}</td><td><div class="action-buttons"><button class="btn btn-primary" data-id="${lead.id}" data-action="edit-lead"><i class="fas fa-edit"></i></button><button class="btn btn-danger" data-id="${lead.id}" data-action="delete-lead"><i class="fas fa-trash"></i></button></div></td>`;
+    row.innerHTML = `
+      <td>${formatDateBR(lead.data_entrada)}</td>
+      <td>${lead.entrada_leads_ask_suite || '-'}</td>
+      <td>${lead.fila_atendimento || '-'}</td>
+      <td>${lead.atendimento || '-'}</td>
+      <td>${lead.qualificacao || '-'}</td>
+      <td>${lead.oportunidade || '-'}</td>
+      <td>${lead.aguardando_pagamento || '-'}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn btn-primary" data-id="${lead.id}" data-action="edit-lead"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger" data-id="${lead.id}" data-action="delete-lead"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>`;
     tbody.appendChild(row);
   });
+  
   addTableActionListeners(tbody);
 }
-
-// ================== Atualização da UI (Métricas e Tabelas) ==================
-// ... (outras funções de atualização) ...
-
-// ===================================================================
-//   SUBSTITUA SUA FUNÇÃO 'updateB2cTable' PELA VERSÃO ABAIXO
-// ===================================================================
-
-// ===================================================================
-//   SUBSTITUA SUA FUNÇÃO 'updateB2cTable' PELA VERSÃO ABAIXO
-// ===================================================================
 
 function updateB2cTable(b2cData) {
   const tbody = document.getElementById('b2cTableBody');
   if (!tbody) return;
   
-  // Ordena os dados pela data mais recente
   const sortedData = [...b2cData].sort((a, b) => new Date(b.data) - new Date(a.data));
   
-  tbody.innerHTML = ''; // Limpa a tabela antiga
+  tbody.innerHTML = '';
   
-  // Itera sobre os dados ordenados para criar as novas linhas
   (sortedData || []).forEach(item => {
     const row = document.createElement('tr');
 
-    // --- LÓGICA PARA EXIBIR O TEXTO E A COR DO CUPOM ---
     const cupomText = item.usou_cupom ? 'Sim' : 'Não';
-    // Define uma classe CSS para colorir o 'Sim' de verde e o 'Não' de vermelho
     const cupomClass = item.usou_cupom ? 'status-confirmado' : 'status-cancelado';
-    // ----------------------------------------------------
-
-    // --- LÓGICA PARA AS CLASSES DE STATUS ---
+    
     const statusClass = (item.status || 'pendente').toLowerCase().replace(/\s+/g, '-');
     const pagClass = (item.status_pagamento || 'nao-informado').toLowerCase().replace(/\s+/g, '-');
-    // ----------------------------------------
 
-    // Constrói o HTML da linha com TODAS as colunas corretas
     row.innerHTML = `
+      <td>${item.id_externo || '-'}</td>
       <td>${formatDateBR(item.data)}</td>
       <td>${item.nome_hotel || '-'}</td>
       <td>${formatCurrency(item.valor || 0)}</td>
-      
-      <!-- ======================================================== -->
-      <!--      CÉLULAS CORRIGIDAS PARA USAR OS DADOS CERTOS      -->
-      <!-- ======================================================== -->
       <td>${item.forma_pagamento || 'Não Informado'}</td>
       <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
-      <!-- ======================================================== -->
-
       <td><span class="status-badge status-${statusClass}">${item.status || 'Pendente'}</span></td>
       <td><span class="status-badge status-${pagClass}">${item.status_pagamento || 'Não Informado'}</span></td>
       <td>
@@ -337,8 +361,6 @@ function updateB2cTable(b2cData) {
   
   addTableActionListeners(tbody);
 }
-
-
 
 function addTableActionListeners(tbody) {
     tbody.querySelectorAll('button[data-action]').forEach(btn => {
@@ -415,7 +437,15 @@ function updateB2cCharts(b2cData, metrics) {
 
     createOrUpdateChart('statusChart', {
         type: "pie",
-        data: { labels: ["Confirmados", "Pendentes", "Cancelados"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#4caf50", "#ffc107", "#f44336"], borderColor: '#ffffff', borderWidth: 2 }] },
+        data: { 
+            labels: Object.keys(metrics.status_stats), 
+            datasets: [{ 
+                data: Object.values(metrics.status_stats), 
+                backgroundColor: ["#4caf50", "#ffc107", "#f44336", "#9e9e9e", "#2196f3"], 
+                borderColor: '#ffffff', 
+                borderWidth: 2 
+            }] 
+        },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
     });
 
@@ -424,13 +454,7 @@ function updateB2cCharts(b2cData, metrics) {
         data: { labels: metrics.status_pagamento.map(s => s.status_pagamento), datasets: [{ label: "Quantidade", data: metrics.status_pagamento.map(s => s.quantidade), backgroundColor: "#4facfe" }] },
         options: { responsive: true, maintainAspectRatio: false, indexAxis: "y", plugins: { legend: { display: false } } }
     });
-
-    createOrUpdateChart('cupomChart', {
-        type: "pie",
-        data: { labels: ["Não", "Sim"], datasets: [{ data: [metrics.total_confirmados, metrics.total_pendentes, metrics.total_cancelados], backgroundColor: ["#f44336", "#4caf50"], borderColor: '#ffffff', borderWidth: 2 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
-    });
-    
+        
     if (metrics.forma_pagamento) {
         createOrUpdateChart('formaPagamentoChart', {
             type: 'doughnut',
@@ -448,6 +472,19 @@ function updateB2cCharts(b2cData, metrics) {
         });
     }
 
+    createOrUpdateChart('cupomChart', {
+        type: "pie",
+        data: { 
+            labels: Object.keys(metrics.cupom_stats), 
+            datasets: [{ 
+                data: Object.values(metrics.cupom_stats), 
+                backgroundColor: ["#4caf50","#e40909ff" ], 
+                borderColor: '#ffffff', 
+                borderWidth: 2 
+            }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "top" } } }
+    });
    
     const topHoteisQtd = [...metrics.hoteis_mais_vendidos].sort((a, b) => b.quantidade - a.quantidade).slice(0, 5);
     createOrUpdateChart('topHoteisQtdChart', {
@@ -461,24 +498,7 @@ function updateB2cCharts(b2cData, metrics) {
     });
 }
 
-// ================== Processamento de Dados para Gráficos ==================
-function processTimelineData(data, dateField, valueField = null) {
-  const grouped = {};
-  (data || []).forEach(item => {
-    if (!item[dateField]) return;
-    const dateStr = String(item[dateField]).split('T')[0];
-    if (!grouped[dateStr]) grouped[dateStr] = 0;
-    grouped[dateStr] += valueField ? (Number(item[valueField]) || 0) : 1;
-  });
-  const sortedDates = Object.keys(grouped).sort((a, b) => new Date(a) - new Date(b));
-  return { labels: sortedDates.map(date => formatDateBR(date)), data: sortedDates.map(date => grouped[date]) };
-}
-
 // ================== Modais (Adicionar/Editar) ==================
-// ===================================================================
-//   SUBSTITUA SUA FUNÇÃO 'openModal' PELA VERSÃO ABAIXO
-// ===================================================================
-
 function openModal(type, data = null) {
   editingId = data ? data.id : null;
   const modalId = `${type}Modal`;
@@ -503,27 +523,15 @@ function openModal(type, data = null) {
     }
   } else if (type === 'b2c') {
     if (data) {
-      // --- LÓGICA ANTIGA (JÁ EXISTENTE) ---
+      form.id_externo.value = data.id_externo || '';
       form.data.value = formatDate(data.data);
       form.nome_hotel.value = data.nome_hotel || '';
       form.valor.value = data.valor || '';
       form.status.value = data.status || '';
       form.status_pagamento.value = data.status_pagamento || '';
-
-      // ========================================================
-      //      INÍCIO DAS LINHAS ADICIONADAS PARA CORREÇÃO
-      // ========================================================
-      // Preenche o campo 'Forma de Pagamento' com o valor salvo, ou 'Não Informado' se não houver.
       form.forma_pagamento.value = data.forma_pagamento || 'Não Informado';
-      
-      // Preenche o campo 'Usou Cupom' convertendo o booleano (true/false) para string.
       form.usou_cupom.value = data.usou_cupom ? 'true' : 'false';
-      // ========================================================
-      //        FIM DAS LINHAS ADICIONADAS PARA CORREÇÃO
-      // ========================================================
-
     } else {
-      // Define os valores padrão para um novo registro
       form.data.value = formatDate(new Date());
       form.forma_pagamento.value = 'Não Informado';
       form.usou_cupom.value = 'false';
@@ -553,32 +561,22 @@ async function handleLeadSubmit(e) {
   };
   await saveData('lead', data, editingId);
 }
-// ===================================================================
-//   SUBSTITUA SUA FUNÇÃO 'handleB2cSubmit' PELA VERSÃO ABAIXO
-// ===================================================================
 
 async function handleB2cSubmit(e) {
-  e.preventDefault(); // Impede o recarregamento da página
+  e.preventDefault();
   const formData = new FormData(e.target);
-  
-  // Coleta todos os dados do formulário, incluindo os novos
   const data = {
+    id_externo: formData.get('id_externo'),
     data: formData.get('data'),
     nome_hotel: formData.get('nome_hotel'),
     valor: parseFloat(formData.get('valor').replace(',', '.')) || 0,
     status: formData.get('status'),
     status_pagamento: formData.get('status_pagamento'),
-    
-    // --- COLETA OS NOVOS DADOS DO FORMULÁRIO ---
     forma_pagamento: formData.get('forma_pagamento'),
-    // Converte o valor de texto 'true'/'false' para um booleano real
-    usou_cupom: formData.get('usou_cupom') === 'true' 
+    usou_cupom: formData.get('usou_cupom') === 'true'
   };
-  
-  // Chama a função genérica para salvar os dados
   await saveData('b2c', data, editingId);
 }
-
 
 async function saveData(type, data, id) {
   const endpoint = type === 'lead' ? 'leads' : 'b2c';
@@ -620,6 +618,7 @@ async function loadSingleItemForEdit(endpoint, type, id) {
         const resp = await fetch(`/api/${endpoint}/${id}`);
         if (!resp.ok) throw new Error(`Não foi possível carregar o item ${id}`);
         const item = await resp.json();
+        open// ...continuação da função loadSingleItemForEdit
         openModal(type, item);
     } catch (err) {
         console.error(`Erro ao buscar ${type} ${id}:`, err);
@@ -628,6 +627,10 @@ async function loadSingleItemForEdit(endpoint, type, id) {
         showLoading(false);
     }
 }
+
+// ===================================================================
+//   FUNÇÕES DE DELEÇÃO
+// ===================================================================
 
 async function deleteLead(id) {
     await deleteItem('leads', id);
@@ -638,14 +641,17 @@ async function deleteB2c(id) {
 }
 
 async function deleteItem(type, id) {
-  if (!confirm(`Tem certeza que deseja deletar este item?`)) return;
+  if (!confirm(`Tem certeza que deseja deletar este item? A ação não pode ser desfeita.`)) return;
+  
   showLoading(true);
   try {
     const resp = await fetch(`/api/${type}/${id}`, { method: 'DELETE' });
+    
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
       throw new Error(errData.error || `Erro ao deletar item.`);
     }
+    
     loadData();
     showToast('Item deletado com sucesso!', 'success');
   } catch (err) {
@@ -659,12 +665,18 @@ async function deleteItem(type, id) {
 async function exportToPDF() {
   showLoading(true);
   try {
-    const params = new URLSearchParams({ data_inicio: currentFilters.dataInicio, data_fim: currentFilters.dataFim, tipo: currentTab });
+    const params = new URLSearchParams({ 
+      data_inicio: currentFilters.dataInicio, 
+      data_fim: currentFilters.dataFim, 
+      tipo: currentTab 
+    });
     const resp = await fetch(`/api/export/pdf?${params}`);
+    
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
       throw new Error(errData.error || 'Erro ao gerar o PDF.');
     }
+    
     const blob = await resp.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -723,69 +735,9 @@ function showToast(message, type = 'info') {
 
 // ================== Lógica do Filtro de Hotel e Popup ==================
 function handleHotelSearch() {
-    const searchInput = document.getElementById('hotelSearchInput');
-    const searchTerm = searchInput.value.trim().toLowerCase();
-
-    if (!searchTerm) {
-        const originalMetrics = calculateB2cMetrics(allB2cData);
-        updateB2cMetrics(originalMetrics);
-        return;
-    }
-
-    const hotelData = allB2cData.filter(item => 
-        item.nome_hotel && item.nome_hotel.toLowerCase().includes(searchTerm)
-    );
-
-    if (hotelData.length === 0) {
-        showToast(`Nenhum hotel encontrado para "${searchInput.value}"`, 'warning');
-        const originalMetrics = calculateB2cMetrics(allB2cData);
-        updateB2cMetrics(originalMetrics);
-        return;
-    }
-    
-    const totalRegistrosHotel = hotelData.length;
-    const valorTotalHotel = hotelData.reduce((sum, item) => sum + (Number(item.valor) || 0), 0);
-    
-    document.getElementById('totalB2cRegistros').textContent = totalRegistrosHotel;
-    document.getElementById('totalB2cValor').textContent = formatCurrency(valorTotalHotel);
-
-    const chartZoomModal = document.getElementById('chartZoomModal');
-    const chartZoomContainer = document.getElementById('chartZoomContainer');
-    const chartZoomTitle = document.getElementById('chartZoomTitle');
-    
-    const hotelName = hotelData[0].nome_hotel;
-    chartZoomTitle.innerText = `Detalhe de Vendas: ${hotelName}`;
-
-    if (charts.zoomChart) {
-        charts.zoomChart.destroy();
-    }
-
-    let summaryHTML = `
-        <div class="popup-summary">
-            <div class="summary-item"><strong>Total de Vendas:</strong><span>${totalRegistrosHotel}</span></div>
-            <div class="summary-item"><strong>Valor Total Vendido:</strong><span>${formatCurrency(valorTotalHotel)}</span></div>
-        </div>
-    `;
-
-    let tableHTML = `
-        <div class="table-wrapper"><table class="data-table">
-            <thead><tr><th>Data da Venda</th><th>Valor</th><th>Forma de Pagamento</th><th>Usou Cupom?</th></tr></thead>
-            <tbody>`;
-
-    hotelData.forEach(item => {
-        const cupomText = item.usou_cupom ? 'Sim' : 'Não';
-        const cupomClass = item.usou_cupom ? 'status-confirmado' : 'status-cancelado';
-        tableHTML += `<tr>
-            <td>${formatDateBR(item.data)}</td>
-            <td>${formatCurrency(item.valor)}</td>
-            <td>${item.forma_pagamento || 'Não Informado'}</td>
-            <td><span class="status-badge ${cupomClass}">${cupomText}</span></td>
-        </tr>`;
-    });
-
-    tableHTML += `</tbody></table></div>`;
-    chartZoomContainer.innerHTML = summaryHTML + tableHTML;
-    chartZoomModal.classList.add('active');
+    // Esta função foi integrada à 'applyFilters' e pode ser removida se não for usada em outro lugar.
+    // Mantendo por segurança, mas a lógica principal agora está em applyFilters.
+    applyFilters();
 }
 
 function openChartZoom(originalChart) {
@@ -793,7 +745,10 @@ function openChartZoom(originalChart) {
     const chartZoomContainer = document.getElementById('chartZoomContainer');
     const chartZoomTitle = document.getElementById('chartZoomTitle');
 
-    if (!originalChart) return;
+    if (!originalChart || !originalChart.options || !originalChart.options.plugins || !originalChart.options.plugins.title) {
+        console.error("Gráfico inválido para zoom", originalChart);
+        return;
+    }
 
     chartZoomTitle.innerText = originalChart.options.plugins.title.text || 'Visualização do Gráfico';
     
@@ -811,3 +766,4 @@ function openChartZoom(originalChart) {
     });
     chartZoomModal.classList.add('active');
 }
+

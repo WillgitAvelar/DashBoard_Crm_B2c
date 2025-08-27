@@ -16,7 +16,7 @@
         <header class="header">
             <div class="header-content">
                 <h1 class="logo">
-                    <img src="{{ url_for('static', filename='logo.png'  ) }}" alt="Dashboard Analytics" class="logo-image">
+                    <img src="{{ url_for('static', filename='logo.png'    ) }}" alt="Dashboard Analytics" class="logo-image">
                     Dashboard Analytics CRM B2C
                 </h1>
                 <div class="header-actions">
@@ -85,40 +85,123 @@
                     <div class="chart-container"><h3>Formas de Pagamento</h3><canvas id="formaPagamentoChart"></canvas></div>
                     <div class="chart-container"><h3>Uso de Cupons</h3><canvas id="cupomChart"></canvas></div>
                     <div class="chart-container"><h3>Top 5 Hotéis (Qtd)</h3><canvas id="topHoteisQtdChart"></canvas></div>
-                    <div class="chart-container"><h3></h3><canvas id=""></canvas></div>
-                    <div class="chart-container"><h3></h3><canvas id=""></canvas></div>
                 </div>
 
                 <div class="section-header"><h3>Lista B2C</h3><button class="btn btn-secondary" id="toggleB2cBtn">👁️ Mostrar/Esconder</button></div>
-<!-- Dentro do seu index.html -->
-<table class="data-table" id="b2cTable">
-    <thead>
-        <tr>
-            <th>Data</th>
-            <th>Hotel</th>
-            <th>Valor</th>
-            <!-- ======================================================== -->
-            <!--      NOVOS CABEÇALHOS ADICIONADOS AQUI               -->
-            <!-- ======================================================== -->
-            <th>Forma de Pagamento</th>
-            <th>Usou Cupom?</th>
-            <!-- ======================================================== -->
-            <th>Status</th>
-            <th>Status Pagamento</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody id="b2cTableBody">
-        <!-- Dados inseridos via JavaScript -->
-    </tbody>
-</table>
+               <div class="table-container" id="b2cTableContainer" style="display:none;">
+                      <div class="table-wrapper">
+                          <table class="data-table" id="b2cTable">
+                              <thead>
+                                  <tr>
+                                      <!-- ADICIONE A COLUNA DO CABEÇALHO AQUI -->
+                                      <th>ID Externo</th> 
+                                      
+                                      <th>Data</th>
+                                      <th>Hotel</th>
+                                      <th>Valor</th>
+                                      <th>Forma de Pagamento</th>
+                                      <th>Usou Cupom?</th>
+                                      <th>Status</th>
+                                      <th>Status Pagamento</th>
+                                      <th>Ações</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="b2cTableBody">
+                                  <!-- Dados serão inseridos via JavaScript aqui -->
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
 
+            </div>
         </main>
     </div>
     
-    <!-- ================== MODAIS ================== -->
-    <div class="modal" id="leadModal"><div class="modal-content"><div class="modal-header"><h3 id="leadModalTitle">Adicionar Lead</h3><button class="modal-close" id="closeLeadModal"><i class="fas fa-times"></i></button></div><form id="leadForm"><div class="form-group"><label for="leadDataEntrada">Data de Entrada:</label><input type="date" id="leadDataEntrada" name="data_entrada" required></div><div class="form-group"><label for="leadAskSuite">Entrada Leads</label><input type="text" id="leadAskSuite" name="entrada_leads_ask_suite"></div><div class="form-group"><label for="leadFilaAtendimento">Fila de Atendimento:</label><input type="text" id="leadFilaAtendimento" name="fila_atendimento"></div><div class="form-group"><label for="leadAtendimento">Atendimento:</label><input type="text" id="leadAtendimento" name="atendimento"></div><div class="form-group"><label for="leadQualificacao">Qualificação:</label><input type="text" id="leadQualificacao" name="qualificacao"></div><div class="form-group"><label for="leadOportunidade">Oportunidade:</label><input type="text" id="leadOportunidade" name="oportunidade"></div><div class="form-group"><label for="leadAguardandoPagamento">Aguardando Pagamento:</label><input type="text" id="leadAguardandoPagamento" name="aguardando_pagamento"></div><div class="form-actions"><button type="button" class="btn btn-outline" id="cancelLeadBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div></form></div></div>
-    <div class="modal" id="b2cModal"><div class="modal-content"><div class="modal-header"><h3 id="b2cModalTitle">Adicionar B2C</h3><button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button></div><form id="b2cForm"><div class="form-group"><label for="b2cData">Data:</label><input type="date" id="b2cData" name="data" required></div><div class="form-group"><label for="b2cNomeHotel">Nome do Hotel:</label><input type="text" id="b2cNomeHotel" name="nome_hotel" required></div><div class="form-group"><label for="b2cValor">Valor:</label><input type="number" id="b2cValor" name="valor" step="0.01" required></div><div class="form-group"><label for="b2cFormaPagamento">Forma de Pagamento:</label><select id="b2cFormaPagamento" name="forma_pagamento" required><option value="Não Informado">Selecione...</option><option value="Crédito">Crédito</option><option value="Débito">Débito</option><option value="Boleto">Boleto</option><option value="Depósito Bancário">Depósito Bancário</option><option value="Faturado">Faturado</option></select></div><div class="form-group"><label for="b2cUsouCupom">Usou Cupom de Desconto?</label><select id="b2cUsouCupom" name="usou_cupom" required><option value="false">Não</option><option value="true">Sim</option></select></div><div class="form-group"><label for="b2cStatus">Status:</label><select id="b2cStatus" name="status" required><option value="">Selecione...</option><option value="Ativo">Ativo</option><option value="Pendente">Pendente</option><option value="Cancelado">Cancelado</option><option value="Confirmado">Confirmado</option></select></div><div class="form-group"><label for="b2cStatusPagamento">Status de Pagamento:</label><select id="b2cStatusPagamento" name="status_pagamento" required><option value="">Selecione...</option><option value="Pago">Pago</option><option value="Pendente">Pendente</option><option value="Atrasado">Atrasado</option><option value="Cancelado">Cancelado</option></select></div><div class="form-actions"><button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div></form></div></div>
+    <!-- ================== FORMULARIO LEADS ================== -->
+    <div class="modal" id="leadModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="leadModalTitle">Adicionar Lead</h3>
+          <button class="modal-close" id="closeLeadModal"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="leadForm">
+          <div class="form-group"><label for="leadDataEntrada">Data de Entrada:</label><input type="date" id="leadDataEntrada" name="data_entrada" required></div>
+          <div class="form-group"><label for="leadAskSuite">Entrada Leads</label><input type="number" id="leadAskSuite" name="entrada_leads_ask_suite"></div>
+          <div class="form-group"><label for="leadFilaAtendimento">Fila de Atendimento:</label><input type="number" id="leadFilaAtendimento" name="fila_atendimento"></div>
+          <div class="form-group"><label for="leadAtendimento">Atendimento:</label><input type="number" id="leadAtendimento" name="atendimento"></div>
+          <div class="form-group"><label for="leadQualificacao">Qualificação:</label><input type="number" id="leadQualificacao" name="qualificacao"></div>
+          <div class="form-group"><label for="leadOportunidade">Oportunidade:</label><input type="number" id="leadOportunidade" name="oportunidade"></div>
+          <div class="form-group"><label for="leadAguardandoPagamento">Aguardando Pagamento:</label><input type="number" id="leadAguardandoPagamento" name="aguardando_pagamento"></div>
+          <div class="form-actions"><button type="button" class="btn btn-outline" id="cancelLeadBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================== FORMULARIO B2C (AJUSTADO) ================== -->
+    <div class="modal" id="b2cModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="b2cModalTitle">Adicionar B2C</h3>
+          <button class="modal-close" id="closeB2cModal"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="b2cForm">
+          
+          <!-- ======================================================= -->
+          <!--   CAMPO DE ID EXTERNO ADICIONADO EXATAMENTE AQUI   -->
+          <!-- ======================================================= -->
+          <div class="form-group">
+            <label for="b2cIdExterno">ID Externo (Opcional):</label>
+            <input type="text" id="b2cIdExterno" name="id_externo" placeholder="Ex: CRM-12345">
+          </div>
+
+          <div class="form-group"><label for="b2cData">Data:</label><input type="date" id="b2cData" name="data" required></div>
+          <div class="form-group"><label for="b2cNomeHotel">Nome do Hotel:</label><input type="text" id="b2cNomeHotel" name="nome_hotel" required></div>
+          <div class="form-group"><label for="b2cValor">Valor:</label><input type="number" id="b2cValor" name="valor" step="0.01" required></div>
+          <div class="form-group">
+            <label for="b2cFormaPagamento">Forma de Pagamento:</label>
+            <select id="b2cFormaPagamento" name="forma_pagamento" required>
+              <option value="Não Informado">Selecione...</option>
+              <option value="Pix">Pix</option>
+              <option value="Crédito">Crédito</option>
+              <option value="Débito">Débito</option>
+              <option value="Boleto">Boleto</option>
+              <option value="Depósito Bancário">Depósito Bancário</option>
+              <option value="Faturado">Faturado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="b2cUsouCupom">Usou Cupom de Desconto?</label>
+            <select id="b2cUsouCupom" name="usou_cupom" required>
+              <option value="false">Não</option>
+              <option value="true">Sim</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="b2cStatus">Status:</label>
+            <select id="b2cStatus" name="status" required>
+              <option value="">Selecione...</option>
+              <option value="Confirmado">Confirmado</option>
+              <option value="Reservado">Reservado</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Negado">Negado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="b2cStatusPagamento">Status de Pagamento:</label>
+            <select id="b2cStatusPagamento" name="status_pagamento" required>
+              <option value="">Selecione...</option>
+              <option value="Pago">Pago</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Atrasado">Atrasado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="form-actions"><button type="button" class="btn btn-outline" id="cancelB2cBtn">Cancelar</button><button type="submit" class="btn btn-primary">Salvar</button></div>
+        </form>
+      </div>
+    </div>
+    
     <div class="modal" id="chartZoomModal"><div class="modal-content modal-content-large"><div class="modal-header"><h3 id="chartZoomTitle">Visualização do Gráfico</h3><button class="modal-close" id="closeChartZoomModal"><i class="fas fa-times"></i></button></div><div class="chart-zoom-container" id="chartZoomContainer"></div></div></div>
     
     <!-- Utilitários da UI -->

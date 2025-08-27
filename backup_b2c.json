@@ -1,0 +1,1498 @@
+[
+  {
+    "id": 1,
+    "data": "2025-08-18",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 6262.6,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 2,
+    "data": "2025-08-16",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 6175.95,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 3,
+    "data": "2025-08-15",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2853.6,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 4,
+    "data": "2025-08-11",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 3425.82,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 5,
+    "data": "2025-08-11",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 4708.76,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 6,
+    "data": "2025-08-09",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3346.71,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 7,
+    "data": "2025-08-07",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort",
+    "valor": 8370.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 8,
+    "data": "2025-08-06",
+    "nome_hotel": "Hotel Vilarejo Praia",
+    "valor": 3633.39,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 9,
+    "data": "2025-08-06",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 4900.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 10,
+    "data": "2025-08-05",
+    "nome_hotel": "Hotel Vilarejo Praia",
+    "valor": 4597.39,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 11,
+    "data": "2025-08-05",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 12425.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 12,
+    "data": "2025-08-04",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1159.7,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 13,
+    "data": "2025-08-03",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3991.08,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 14,
+    "data": "2025-08-02",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2794.34,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 15,
+    "data": "2025-08-02",
+    "nome_hotel": " Hotel Vilarejo Praia",
+    "valor": 3502.99,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 16,
+    "data": "2025-08-02",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 3101.71,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 17,
+    "data": "2025-08-02",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 7100.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 18,
+    "data": "2025-08-01",
+    "nome_hotel": "Transamerica Resort Comandatuba – All Inclusive",
+    "valor": 22551.56,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 19,
+    "data": "2025-07-31",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 6361.31,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 20,
+    "data": "2025-07-29",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 7551.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 21,
+    "data": "2025-07-29",
+    "nome_hotel": "Hotel Vilarejo Praia",
+    "valor": 3633.39,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 22,
+    "data": "2025-07-28",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 7363.29,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 23,
+    "data": "2025-07-27",
+    "nome_hotel": "Malai Manso Resort Yatch Convention e SPA",
+    "valor": 5816.73,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 24,
+    "data": "2025-07-26",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2367.32,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 25,
+    "data": "2025-07-25",
+    "nome_hotel": "Kenoa - Exclusive Beach Spa & Resort ",
+    "valor": 14839.44,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 26,
+    "data": "2025-07-25",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 727.41,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 27,
+    "data": "2025-07-25",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 867.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 28,
+    "data": "2025-07-24",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1818.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 29,
+    "data": "2025-07-23",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 7167.75,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 30,
+    "data": "2025-07-22",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2430.44,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 31,
+    "data": "2025-07-22",
+    "nome_hotel": " Búzios Beach Resort by WAM Experience",
+    "valor": 2305.78,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 32,
+    "data": "2025-07-21",
+    "nome_hotel": "Ondas Praia Resort by WAM Experience",
+    "valor": 1718.21,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 33,
+    "data": "2025-07-20",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2055.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 34,
+    "data": "2025-07-20",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 5070.94,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 35,
+    "data": "2025-07-19",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 5768.31,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 36,
+    "data": "2025-07-18",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1102.2,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 37,
+    "data": "2025-07-18",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2728.38,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 38,
+    "data": "2025-07-18",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 6301.86,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 39,
+    "data": "2025-07-17",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 14163.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 40,
+    "data": "2025-07-17",
+    "nome_hotel": "Grand Oca Maragogi Beach & Leisure Resort",
+    "valor": 14546.4,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 41,
+    "data": "2025-07-16",
+    "nome_hotel": " Portobello Resort e Safari ",
+    "valor": 5640.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 42,
+    "data": "2025-07-15",
+    "nome_hotel": "Tivoli EcoResort Praia do Forte",
+    "valor": 12211.12,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 43,
+    "data": "2025-07-15",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 7545.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 44,
+    "data": "2025-07-13",
+    "nome_hotel": " Vila Gale Angra Resort - All Inclusive",
+    "valor": 6633.74,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 45,
+    "data": "2025-07-13",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 8397.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 46,
+    "data": "2025-07-12",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1781.81,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 47,
+    "data": "2025-07-12",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 4864.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 48,
+    "data": "2025-07-09",
+    "nome_hotel": "Portobello Resort e Safari",
+    "valor": 6401.02,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 49,
+    "data": "2025-07-08",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3460.63,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 50,
+    "data": "2025-07-08",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1136.68,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 51,
+    "data": "2025-07-07",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 10708.87,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 52,
+    "data": "2025-07-06",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 6497.28,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 53,
+    "data": "2025-07-06",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2606.53,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 54,
+    "data": "2025-07-06",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 4165.01,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 55,
+    "data": "2025-07-06",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 7229.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 56,
+    "data": "2025-07-04",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 4900.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 57,
+    "data": "2025-07-03",
+    "nome_hotel": "Hotel Magique Le Canton",
+    "valor": 3355.02,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 58,
+    "data": "2025-07-02",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 12852.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 59,
+    "data": "2025-07-02",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 3910.86,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 60,
+    "data": "2025-07-02",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 10746.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 61,
+    "data": "2025-06-30",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 5221.5,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 62,
+    "data": "2025-06-29",
+    "nome_hotel": " Cana Brava All Inclusive Resort",
+    "valor": 8921.72,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 63,
+    "data": "2025-06-28",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 985.32,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 64,
+    "data": "2025-06-28",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 6120.89,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 65,
+    "data": "2025-06-27",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3927.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 66,
+    "data": "2025-06-27",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 13440.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 67,
+    "data": "2025-06-27",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5865.01,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 68,
+    "data": "2025-06-26",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 4108.96,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 69,
+    "data": "2025-06-25",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5360.24,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 70,
+    "data": "2025-06-24",
+    "nome_hotel": "Transamerica Resort Comandatuba – All Inclusive",
+    "valor": 19591.8,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 71,
+    "data": "2025-06-24",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5360.24,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 72,
+    "data": "2025-06-24",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5360.24,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 73,
+    "data": "2025-06-24",
+    "nome_hotel": "Ocean Palace Beach Resort All Inclusive Premium",
+    "valor": 11933.33,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 74,
+    "data": "2025-06-20",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1096.03,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 75,
+    "data": "2025-06-19",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2126.6,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 76,
+    "data": "2025-06-18",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 9724.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 77,
+    "data": "2025-06-17",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3905.74,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 78,
+    "data": "2025-06-17",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 823.62,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 79,
+    "data": "2025-06-16",
+    "nome_hotel": " Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 8908.61,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 80,
+    "data": "2025-06-15",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 4944.64,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 81,
+    "data": "2025-06-15",
+    "nome_hotel": "Hotel Village Le Canton",
+    "valor": 1937.45,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 82,
+    "data": "2025-06-10",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 2959.63,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 83,
+    "data": "2025-06-10",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 7056.77,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 84,
+    "data": "2025-06-08",
+    "nome_hotel": "Iberostar Waves Bahia",
+    "valor": 7159.78,
+    "status": "Ativo",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 85,
+    "data": "2025-06-07",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 5320.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 86,
+    "data": "2025-06-07",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 6431.4,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 87,
+    "data": "2025-06-04",
+    "nome_hotel": " Santíssimo Resort",
+    "valor": 2959.63,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 88,
+    "data": "2025-05-30",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 14074.03,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 89,
+    "data": "2025-05-27",
+    "nome_hotel": "Hotel Village Le Canton",
+    "valor": 1242.6,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 90,
+    "data": "2025-05-24",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 2664.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 91,
+    "data": "2025-05-23",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 4142.33,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 92,
+    "data": "2025-05-23",
+    "nome_hotel": "Fasano Angra dos Reis",
+    "valor": 23380.1,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 93,
+    "data": "2025-05-22",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3031.1,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 94,
+    "data": "2025-05-19",
+    "nome_hotel": "Fasano Angra dos Reis",
+    "valor": 6494.7,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 95,
+    "data": "2025-05-17",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 5052.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 96,
+    "data": "2025-05-16",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 4812.91,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 97,
+    "data": "2025-05-12",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 7400.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 98,
+    "data": "2025-05-11",
+    "nome_hotel": "Portobello Resort e Safari",
+    "valor": 9360.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 99,
+    "data": "2025-05-04",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 14033.88,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 100,
+    "data": "2025-05-04",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 7804.79,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 101,
+    "data": "2025-05-03",
+    "nome_hotel": "The Westin Porto de Galinhas All Inclusive",
+    "valor": 12906.17,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 102,
+    "data": "2025-05-01",
+    "nome_hotel": " Grand Palladium Imbassaí Resort & Spa",
+    "valor": 7154.32,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 103,
+    "data": "2025-04-30",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 8218.21,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 104,
+    "data": "2025-04-29",
+    "nome_hotel": "Grand Amazon Expedition",
+    "valor": 16122.29,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 105,
+    "data": "2025-04-27",
+    "nome_hotel": "Transamerica Resort Comandatuba – All Inclusive",
+    "valor": 17489.12,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 106,
+    "data": "2025-04-27",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort",
+    "valor": 4308.57,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 107,
+    "data": "2025-04-27",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 2282.11,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 108,
+    "data": "2025-04-27",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 12354.08,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 109,
+    "data": "2025-04-27",
+    "nome_hotel": " Vila Gale Touros Resort - All Inclusive",
+    "valor": 5534.86,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 110,
+    "data": "2025-04-27",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5292.72,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 111,
+    "data": "2025-04-23",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 6548.4,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 112,
+    "data": "2025-04-22",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 4850.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 113,
+    "data": "2025-04-20",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 12286.82,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 114,
+    "data": "2025-04-20",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 4850.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 115,
+    "data": "2025-04-20",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 4850.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 116,
+    "data": "2025-04-20",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3194.11,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 117,
+    "data": "2025-04-20",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 4850.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 118,
+    "data": "2025-04-19",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 6316.25,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 119,
+    "data": "2025-04-19",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3042.42,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 120,
+    "data": "2025-04-18",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 20323.66,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 121,
+    "data": "2025-04-18",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 4945.03,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 122,
+    "data": "2025-04-17",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 6493.47,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 123,
+    "data": "2025-04-06",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 4719.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 124,
+    "data": "2025-04-05",
+    "nome_hotel": "Grand Oca Maragogi Beach & Leisure Resort",
+    "valor": 15897.47,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 125,
+    "data": "2025-04-05",
+    "nome_hotel": "Vila Gale Collection Sunset Cumbuco",
+    "valor": 3427.15,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 126,
+    "data": "2025-04-05",
+    "nome_hotel": "Porto Alto Resort - GAV Resorts",
+    "valor": 3578.41,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 127,
+    "data": "2025-04-04",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 11134.82,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 128,
+    "data": "2025-04-04",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 5096.03,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 129,
+    "data": "2025-04-02",
+    "nome_hotel": "Grand Oca Maragogi Beach & Leisure Resort",
+    "valor": 8470.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 130,
+    "data": "2025-03-29",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 4930.78,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 131,
+    "data": "2025-03-26",
+    "nome_hotel": "Tivoli EcoResort Praia do Forte",
+    "valor": 10269.27,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 132,
+    "data": "2025-03-26",
+    "nome_hotel": "Arraial d'Ajuda Eco Resort  ",
+    "valor": 13962.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 133,
+    "data": "2025-03-26",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 6017.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 134,
+    "data": "2025-03-24",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 18225.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 135,
+    "data": "2025-03-23",
+    "nome_hotel": "Tivoli EcoResort Praia do Forte",
+    "valor": 12582.25,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 136,
+    "data": "2025-03-23",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 7560.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 137,
+    "data": "2025-03-23",
+    "nome_hotel": " Tivoli EcoResort Praia do Forte",
+    "valor": 11848.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 138,
+    "data": "2025-03-22",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 17970.22,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 139,
+    "data": "2025-03-22",
+    "nome_hotel": "Transamerica Resort Comandatuba – All Inclusive",
+    "valor": 9624.76,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 140,
+    "data": "2025-03-18",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 3633.23,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 141,
+    "data": "2025-03-16",
+    "nome_hotel": "Porto Alto Resort - GAV Resorts",
+    "valor": 1571.49,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 142,
+    "data": "2025-03-16",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 5604.54,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 143,
+    "data": "2025-03-15",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 6729.8,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 144,
+    "data": "2025-03-15",
+    "nome_hotel": "Transamerica Resort Comandatuba – All Inclusive",
+    "valor": 9248.69,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 145,
+    "data": "2025-03-13",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 2749.13,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 146,
+    "data": "2025-03-12",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 7387.6,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 147,
+    "data": "2025-03-11",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 7980.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 148,
+    "data": "2025-03-10",
+    "nome_hotel": " Enotel Porto de Galinhas - All Inclusive",
+    "valor": 13268.1,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 149,
+    "data": "2025-03-09",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 14628.05,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 150,
+    "data": "2025-03-08",
+    "nome_hotel": "Tivoli EcoResort Praia do Forte",
+    "valor": 19948.29,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 151,
+    "data": "2025-03-06",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 1279.84,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 152,
+    "data": "2025-03-03",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 10121.88,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 153,
+    "data": "2025-03-02",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 5191.58,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 154,
+    "data": "2025-02-26",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 9353.58,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 155,
+    "data": "2025-02-25",
+    "nome_hotel": " Iberostar Waves Bahia",
+    "valor": 6948.57,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 156,
+    "data": "2025-02-23",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 3232.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 157,
+    "data": "2025-02-18",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 7274.88,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 158,
+    "data": "2025-02-17",
+    "nome_hotel": "Vila Gale Salvador",
+    "valor": 3828.96,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 159,
+    "data": "2025-02-16",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 6120.68,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 160,
+    "data": "2025-02-16",
+    "nome_hotel": "Vila Gale Mares Resort - All Inclusive",
+    "valor": 11509.58,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 161,
+    "data": "2025-02-16",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 3374.4,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 162,
+    "data": "2025-02-13",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 1867.88,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 163,
+    "data": "2025-02-13",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 1867.88,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 164,
+    "data": "2025-02-09",
+    "nome_hotel": "Vila Gale Cumbuco Resort - All Inclusive",
+    "valor": 6821.81,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 165,
+    "data": "2025-02-09",
+    "nome_hotel": "Carmel Charme Resort",
+    "valor": 4328.11,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 166,
+    "data": "2025-02-04",
+    "nome_hotel": "Ocean Palace Beach Resort All Inclusive Premium",
+    "valor": 7410.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 167,
+    "data": "2025-02-04",
+    "nome_hotel": "Pratagy Beach Resort All Inclusive",
+    "valor": 9517.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 168,
+    "data": "2025-02-02",
+    "nome_hotel": "Maceio Mar Resort All Inclusive",
+    "valor": 6128.53,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 169,
+    "data": "2025-02-02",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 7362.81,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 170,
+    "data": "2025-01-31",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 5572.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 171,
+    "data": "2025-01-27",
+    "nome_hotel": "Iberostar Selection Praia do Forte",
+    "valor": 12429.22,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 172,
+    "data": "2025-01-26",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 4860.54,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 173,
+    "data": "2025-01-26",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 5166.58,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 174,
+    "data": "2025-01-24",
+    "nome_hotel": "Vila Gale Alagoas Resort - All Inclusive",
+    "valor": 6516.72,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 175,
+    "data": "2025-01-22",
+    "nome_hotel": "Cana Brava All Inclusive Resort",
+    "valor": 10388.26,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 176,
+    "data": "2025-01-22",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 2896.48,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 177,
+    "data": "2025-01-19",
+    "nome_hotel": "Vila Gale Angra Resort - All Inclusive",
+    "valor": 8586.96,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 178,
+    "data": "2025-01-16",
+    "nome_hotel": "Ocean Palace Beach Resort All Inclusive Premium",
+    "valor": 10225.8,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 179,
+    "data": "2025-01-16",
+    "nome_hotel": "Summerville Resort - All Inclusive",
+    "valor": 7956.48,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 180,
+    "data": "2025-01-15",
+    "nome_hotel": "Tivoli EcoResort Praia do Forte",
+    "valor": 12978.29,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 181,
+    "data": "2025-01-06",
+    "nome_hotel": "Portobello Resort e Safari ",
+    "valor": 12768.0,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 182,
+    "data": "2025-08-22",
+    "nome_hotel": "Grand Oca Maragogi Beach & Leisure Resort",
+    "valor": 9613.97,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 183,
+    "data": "2025-08-22",
+    "nome_hotel": "Iberostar Selection Praia do Forte",
+    "valor": 5368.93,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 184,
+    "data": "2025-08-24",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 1582.44,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 185,
+    "data": "2025-08-23",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 2677.05,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 186,
+    "data": "2025-08-23",
+    "nome_hotel": "Búzios Beach Resort by WAM Experience",
+    "valor": 6176.28,
+    "status": "Confirmado",
+    "status_pagamento": "Pago"
+  },
+  {
+    "id": 187,
+    "data": "2025-08-26",
+    "nome_hotel": "Santíssimo Resort",
+    "valor": 1000.0,
+    "status": "Ativo",
+    "status_pagamento": "Pago"
+  }
+]
