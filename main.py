@@ -1,235 +1,214 @@
+# main.py - VERSÃO FINAL, COMPLETA E FUNCIONAL
+
 import os
 from flask import Flask, jsonify, render_template, request
-from datetime import datetime, date
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
-# Importa os modelos do arquivo models.py
-from models import db, Lead, B2C
-
-# --- Configuração Inicial ---
+# --- 1. INICIALIZAÇÃO DO FLASK E CONFIGURAÇÃO ---
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "instance", "project.db")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db.init_app(app)
+instance_path = os.path.join(basedir, 'instance')
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(instance_path, 'project.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-# --- Rota Principal da Interface ---
+
+# --- 2. DEFINIÇÃO DOS MODELOS DO BANCO DE DADOS ---
+class Lead(db.Model):
+    __tablename__ = 'leads'
+    id = db.Column(db.Integer, primary_key=True)
+    data_entrada = db.Column(db.Date, nullable=False)
+    entrada_leads_ask_suite = db.Column(db.Integer, default=0)
+    fila_atendimento = db.Column(db.Integer, default=0)
+    atendimento = db.Column(db.Integer, default=0)
+    qualificacao = db.Column(db.Integer, default=0)
+    oportunidade = db.Column(db.Integer, default=0)
+    aguardando_pagamento = db.Column(db.Integer, default=0)
+
+    def to_dict(self):
+        return {
+            "id": self.id, "data_entrada": self.data_entrada.isoformat(),
+            "entrada_leads_ask_suite": self.entrada_leads_ask_suite,
+            "fila_atendimento": self.fila_atendimento, "atendimento": self.atendimento,
+            "qualificacao": self.qualificacao, "oportunidade": self.oportunidade,
+            "aguardando_pagamento": self.aguardando_pagamento
+        }
+
+class B2C(db.Model):
+    __tablename__ = 'b2c'
+    id = db.Column(db.Integer, primary_key=True)
+    id_externo = db.Column(db.String(100), unique=True, nullable=True)
+    data = db.Column(db.Date, nullable=False)
+    nome_hotel = db.Column(db.String(200), nullable=True)
+    valor = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+    status_pagamento = db.Column(db.String(50), nullable=False)
+    forma_pagamento = db.Column(db.String(50), nullable=False)
+    usou_cupom = db.Column(db.Boolean, default=False, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id, "id_externo": self.id_externo,
+            "data": self.data.isoformat(), "nome_hotel": self.nome_hotel,
+            "valor": self.valor, "status": self.status,
+            "status_pagamento": self.status_pagamento,
+            "forma_pagamento": self.forma_pagamento, "usou_cupom": self.usou_cupom
+        }
+
+
+# --- 3. ROTAS DA APLICAÇÃO ---
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# ===================================================================
-#   ROTA DA API PARA LEADS - COM FILTRO DE DATA
-# ===================================================================
+# --- ROTAS DA API PARA LEADS ---
 @app.route("/api/leads", methods=["GET", "POST"])
 def leads_api():
     if request.method == "GET":
-        query = Lead.query
-
-        # <<< A LÓGICA DO FILTRO É APLICADA AQUI >>>
-        data_inicio_str = request.args.get("data_inicio")
-        data_fim_str = request.args.get("data_fim")
-
-        if data_inicio_str:
-            try:
+        try:
+            query = Lead.query
+            data_inicio_str = request.args.get("data_inicio")
+            if data_inicio_str:
                 data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d").date()
                 query = query.filter(Lead.data_entrada >= data_inicio)
-            except (ValueError, TypeError):
-                pass # Ignora filtro se a data for inválida
-
-        if data_fim_str:
-            try:
+            data_fim_str = request.args.get("data_fim")
+            if data_fim_str:
                 data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d").date()
                 query = query.filter(Lead.data_entrada <= data_fim)
-            except (ValueError, TypeError):
-                pass # Ignora filtro se a data for inválida
-
-        leads_data = query.order_by(Lead.data_entrada.desc()).all()
-        return jsonify([lead.to_dict() for lead in leads_data])
+            leads = query.order_by(Lead.data_entrada.desc()).all()
+            return jsonify([lead.to_dict() for lead in leads])
+        except Exception as e:
+            return jsonify({"error": f"Erro ao buscar leads: {e}"}), 500
 
     if request.method == "POST":
-        # ... (Sua lógica de POST para criar um novo lead) ...
         data = request.get_json()
         try:
             new_lead = Lead(
                 data_entrada=datetime.strptime(data["data_entrada"], "%Y-%m-%d").date(),
-                entrada_leads_ask_suite=data.get("entrada_leads_ask_suite"),
-                fila_atendimento=data.get("fila_atendimento"),
-                atendimento=data.get("atendimento"),
-                qualificacao=data.get("qualificacao"),
-                oportunidade=data.get("oportunidade"),
-                aguardando_pagamento=data.get("aguardando_pagamento")
+                entrada_leads_ask_suite=data.get("entrada_leads_ask_suite", 0),
+                fila_atendimento=data.get("fila_atendimento", 0),
+                atendimento=data.get("atendimento", 0),
+                qualificacao=data.get("qualificacao", 0),
+                oportunidade=data.get("oportunidade", 0),
+                aguardando_pagamento=data.get("aguardando_pagamento", 0)
             )
             db.session.add(new_lead)
             db.session.commit()
+            db.session.refresh(new_lead)
             return jsonify(new_lead.to_dict()), 201
         except Exception as e:
             db.session.rollback()
-            return jsonify({"error": f"Erro ao criar lead: {e}"}), 500
-    
+            return jsonify({"error": f"Erro ao salvar o lead: {e}"}), 500
     return jsonify({"error": "Método não permitido"}), 405
-
-
-# ===================================================================
-#   ROTA DA API PARA B2C - COM FILTRO DE DATA E HOTEL
-# ===================================================================
-@app.route("/api/b2c", methods=["GET", "POST"])
-def b2c_api():
-    if request.method == "GET":
-        query = B2C.query
-
-        # <<< A LÓGICA DO FILTRO É APLICADA AQUI >>>
-        data_inicio_str = request.args.get("data_inicio")
-        data_fim_str = request.args.get("data_fim")
-        hotel_str = request.args.get("hotel") # Filtro de hotel
-
-        if data_inicio_str:
-            try:
-                data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d").date()
-                query = query.filter(B2C.data >= data_inicio)
-            except (ValueError, TypeError):
-                pass
-
-        if data_fim_str:
-            try:
-                data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d").date()
-                query = query.filter(B2C.data <= data_fim)
-            except (ValueError, TypeError):
-                pass
-        
-        if hotel_str:
-            # Usa 'ilike' para busca case-insensitive (não diferencia maiúsculas/minúsculas)
-            query = query.filter(B2C.nome_hotel.ilike(f"%{hotel_str}%"))
-
-        b2c_data = query.order_by(B2C.data.desc()).all()
-        return jsonify([item.to_dict() for item in b2c_data])
-
-    if request.method == "POST":
-        data = request.get_json()
-        try:
-            # Validação de ID Externo único
-            id_externo = data.get("id_externo")
-            if id_externo:
-                existing_item = B2C.query.filter_by(id_externo=id_externo).first()
-                if existing_item:
-                    return jsonify({"error": f"O ID Externo '{id_externo}' já está em uso."}), 409
-
-            new_b2c = B2C(
-                id_externo=id_externo,
-                data=datetime.strptime(data["data"], "%Y-%m-%d").date(),
-                nome_hotel=data.get("nome_hotel"),
-                valor=float(data.get("valor", 0)),
-                forma_pagamento=data.get("forma_pagamento"),
-                usou_cupom=data.get("usou_cupom", False),
-                status=data.get("status"),
-                status_pagamento=data.get("status_pagamento")
-            )
-            db.session.add(new_b2c)
-            db.session.commit()
-            return jsonify(new_b2c.to_dict()), 201
-        except Exception as e:
-            db.session.rollback()
-            # Verifica se o erro é de violação de unicidade (para o caso de id_externo ser UNIQUE)
-            if 'UNIQUE constraint failed' in str(e):
-                # Acessa o id_externo do dado que causou o erro para a mensagem
-                problematic_id = data.get('id_externo', 'desconhecido')
-                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
-            return jsonify({"error": f"Erro ao criar B2C: {e}"}), 500
-
-    return jsonify({"error": "Método não permitido"}), 405
-
-
-# ... (O RESTO DAS SUAS ROTAS DE DETALHE /api/leads/<id> e /api/b2c/<id> CONTINUAM AQUI) ...
-# ... (E A SEÇÃO if __name__ == "__main__": TAMBÉM) ...
 
 @app.route("/api/leads/<int:id>", methods=["GET", "PUT", "DELETE"])
 def lead_detail_api(id):
-    """Obtém, atualiza ou deleta um lead específico."""
     lead = Lead.query.get_or_404(id)
-    
     if request.method == "GET":
         return jsonify(lead.to_dict())
-
     if request.method == "PUT":
         data = request.get_json()
         try:
-            lead.data_entrada = datetime.strptime(data["data_entrada"], "%Y-%m-%d").date()
-            lead.entrada_leads_ask_suite = data.get("entrada_leads_ask_suite")
-            lead.fila_atendimento = data.get("fila_atendimento")
-            lead.atendimento = data.get("atendimento")
-            lead.qualificacao = data.get("qualificacao")
-            lead.oportunidade = data.get("oportunidade")
-            lead.aguardando_pagamento = data.get("aguardando_pagamento")
+            lead.data_entrada = datetime.strptime(data.get('data_entrada'), "%Y-%m-%d").date()
+            lead.entrada_leads_ask_suite = data.get('entrada_leads_ask_suite', lead.entrada_leads_ask_suite)
+            lead.fila_atendimento = data.get('fila_atendimento', lead.fila_atendimento)
+            lead.atendimento = data.get('atendimento', lead.atendimento)
+            lead.qualificacao = data.get('qualificacao', lead.qualificacao)
+            lead.oportunidade = data.get('oportunidade', lead.oportunidade)
+            lead.aguardando_pagamento = data.get('aguardando_pagamento', lead.aguardando_pagamento)
             db.session.commit()
             return jsonify(lead.to_dict())
         except Exception as e:
             db.session.rollback()
-            return jsonify({"error": f"Erro ao atualizar lead: {e}"}), 500
-
+            return jsonify({"error": f"Erro ao atualizar o lead: {e}"}), 500
     if request.method == "DELETE":
         try:
             db.session.delete(lead)
             db.session.commit()
-            return jsonify({"message": "Lead deletado com sucesso"}), 200
+            return jsonify({"message": "Lead deletado com sucesso"})
         except Exception as e:
             db.session.rollback()
-            return jsonify({"error": f"Erro ao deletar lead: {e}"}), 500
+            return jsonify({"error": f"Erro ao deletar o lead: {e}"}), 500
+    return jsonify({"error": "Método não permitido"}), 405
+
+# --- ROTAS DA API PARA B2C ---
+@app.route("/api/b2c", methods=["GET", "POST"])
+def b2c_api():
+    if request.method == "GET":
+        try:
+            query = B2C.query
+            data_inicio_str = request.args.get("data_inicio")
+            if data_inicio_str:
+                data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d").date()
+                query = query.filter(B2C.data >= data_inicio)
+            data_fim_str = request.args.get("data_fim")
+            if data_fim_str:
+                data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d").date()
+                query = query.filter(B2C.data <= data_fim)
+            hotel_str = request.args.get("hotel")
+            if hotel_str:
+                query = query.filter(B2C.nome_hotel.ilike(f"%{hotel_str}%"))
+            b2c_items = query.order_by(B2C.data.desc()).all()
+            return jsonify([item.to_dict() for item in b2c_items])
+        except Exception as e:
+            return jsonify({"error": f"Erro ao buscar B2C: {e}"}), 500
+
+    if request.method == "POST":
+        data = request.get_json()
+        try:
+            new_b2c = B2C(
+                id_externo=data.get('id_externo'),
+                data=datetime.strptime(data["data"], "%Y-%m-%d").date(),
+                nome_hotel=data.get("nome_hotel"), valor=float(data.get("valor", 0)),
+                status=data.get("status"), status_pagamento=data.get("status_pagamento"),
+                forma_pagamento=data.get("forma_pagamento"), usou_cupom=data.get("usou_cupom", False)
+            )
+            db.session.add(new_b2c)
+            db.session.commit()
+            db.session.refresh(new_b2c)
+            return jsonify(new_b2c.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"Erro ao salvar o B2C: {e}"}), 500
+    return jsonify({"error": "Método não permitido"}), 405
 
 @app.route("/api/b2c/<int:id>", methods=["GET", "PUT", "DELETE"])
 def b2c_detail_api(id):
-    """Obtém, atualiza ou deleta um registro B2C específico."""
     b2c_item = B2C.query.get_or_404(id)
-
     if request.method == "GET":
         return jsonify(b2c_item.to_dict())
-
     if request.method == "PUT":
         data = request.get_json()
         try:
-            id_externo = data.get("id_externo")
-            if id_externo:
-                existing_item = B2C.query.filter(B2C.id_externo == id_externo, B2C.id != id).first()
-                if existing_item:
-                    return jsonify({"error": f"O ID Externo '{id_externo}' já pertence a outro registro."}), 409
-
-            b2c_item.id_externo = id_externo
-            b2c_item.data = datetime.strptime(data["data"], "%Y-%m-%d").date()
-            b2c_item.nome_hotel = data.get("nome_hotel")
-            b2c_item.valor = float(data.get("valor", 0))
-            b2c_item.status = data.get("status")
-            b2c_item.status_pagamento = data.get("status_pagamento")
-            b2c_item.forma_pagamento = data.get("forma_pagamento")
-            b2c_item.usou_cupom = data.get("usou_cupom", False)
+            b2c_item.id_externo = data.get('id_externo', b2c_item.id_externo)
+            b2c_item.data = datetime.strptime(data.get('data'), "%Y-%m-%d").date()
+            b2c_item.nome_hotel = data.get('nome_hotel', b2c_item.nome_hotel)
+            b2c_item.valor = float(data.get('valor', b2c_item.valor))
+            b2c_item.status = data.get('status', b2c_item.status)
+            b2c_item.status_pagamento = data.get('status_pagamento', b2c_item.status_pagamento)
+            b2c_item.forma_pagamento = data.get('forma_pagamento', b2c_item.forma_pagamento)
+            b2c_item.usou_cupom = data.get('usou_cupom', b2c_item.usou_cupom)
             db.session.commit()
             return jsonify(b2c_item.to_dict())
         except Exception as e:
             db.session.rollback()
-            if 'UNIQUE constraint failed' in str(e):
-                 # Acessa o id_externo do dado que causou o erro para a mensagem
-                problematic_id = data.get('id_externo', 'desconhecido')
-                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
-            return jsonify({"error": f"Erro ao atualizar B2C: {e}"}), 500
-
+            return jsonify({"error": f"Erro ao atualizar o B2C: {e}"}), 500
     if request.method == "DELETE":
         try:
             db.session.delete(b2c_item)
             db.session.commit()
-            return jsonify({"message": "Item B2C deletado com sucesso"}), 200
+            return jsonify({"message": "Registro B2C deletado com sucesso"})
         except Exception as e:
             db.session.rollback()
-            return jsonify({"error": f"Erro ao deletar B2C: {e}"}), 500
+            return jsonify({"error": f"Erro ao deletar o B2C: {e}"}), 500
+    return jsonify({"error": "Método não permitido"}), 405
 
 
-# --- Execução do Aplicativo ---
+# --- 4. EXECUÇÃO DO APLICATIVO ---
 if __name__ == "__main__":
-    instance_path = os.path.join(basedir, "instance")
-    if not os.path.exists(instance_path):
-        os.makedirs(instance_path)
-    
     with app.app_context():
         db.create_all()
-        
-    app.run(debug=True, host="0.0.0.0", port=5000)
-
-
-
-
+    app.run(debug=True, host='0.0.0.0', port=5000)
