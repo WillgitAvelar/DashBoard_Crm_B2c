@@ -8,8 +8,8 @@ from models import db, Lead, B2C
 # --- Configuração Inicial ---
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'project.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "instance", "project.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # --- Rota Principal da Interface ---
@@ -26,8 +26,8 @@ def leads_api():
         query = Lead.query
 
         # <<< A LÓGICA DO FILTRO É APLICADA AQUI >>>
-        data_inicio_str = request.args.get('data_inicio')
-        data_fim_str = request.args.get('data_fim')
+        data_inicio_str = request.args.get("data_inicio")
+        data_fim_str = request.args.get("data_fim")
 
         if data_inicio_str:
             try:
@@ -78,9 +78,9 @@ def b2c_api():
         query = B2C.query
 
         # <<< A LÓGICA DO FILTRO É APLICADA AQUI >>>
-        data_inicio_str = request.args.get('data_inicio')
-        data_fim_str = request.args.get('data_fim')
-        hotel_str = request.args.get('hotel') # Filtro de hotel
+        data_inicio_str = request.args.get("data_inicio")
+        data_fim_str = request.args.get("data_fim")
+        hotel_str = request.args.get("hotel") # Filtro de hotel
 
         if data_inicio_str:
             try:
@@ -98,16 +98,15 @@ def b2c_api():
         
         if hotel_str:
             # Usa 'ilike' para busca case-insensitive (não diferencia maiúsculas/minúsculas)
-            query = query.filter(B2C.nome_hotel.ilike(f'%{hotel_str}%'))
+            query = query.filter(B2C.nome_hotel.ilike(f"%{hotel_str}%"))
 
         b2c_data = query.order_by(B2C.data.desc()).all()
         return jsonify([item.to_dict() for item in b2c_data])
 
     if request.method == "POST":
-        # LÓGICA CORRIGIDA PARA CRIAR UM NOVO B2C
         data = request.get_json()
         try:
-            # Verifica se o ID externo já existe (se fornecido)
+            # Validação de ID Externo único
             id_externo = data.get("id_externo")
             if id_externo:
                 existing_item = B2C.query.filter_by(id_externo=id_externo).first()
@@ -119,18 +118,21 @@ def b2c_api():
                 data=datetime.strptime(data["data"], "%Y-%m-%d").date(),
                 nome_hotel=data.get("nome_hotel"),
                 valor=float(data.get("valor", 0)),
-                status=data.get("status"),
-                status_pagamento=data.get("status_pagamento"),
                 forma_pagamento=data.get("forma_pagamento"),
-                usou_cupom=data.get("usou_cupom", False)
+                usou_cupom=data.get("usou_cupom", False),
+                status=data.get("status"),
+                status_pagamento=data.get("status_pagamento")
             )
             db.session.add(new_b2c)
             db.session.commit()
             return jsonify(new_b2c.to_dict()), 201
         except Exception as e:
             db.session.rollback()
+            # Verifica se o erro é de violação de unicidade (para o caso de id_externo ser UNIQUE)
             if 'UNIQUE constraint failed' in str(e):
-                return jsonify({"error": f"O ID Externo '{data.get('id_externo')}' já está em uso."}), 409
+                # Acessa o id_externo do dado que causou o erro para a mensagem
+                problematic_id = data.get('id_externo', 'desconhecido')
+                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
             return jsonify({"error": f"Erro ao criar B2C: {e}"}), 500
 
     return jsonify({"error": "Método não permitido"}), 405
@@ -202,7 +204,9 @@ def b2c_detail_api(id):
         except Exception as e:
             db.session.rollback()
             if 'UNIQUE constraint failed' in str(e):
-                 return jsonify({"error": f"O ID Externo '{data.get('id_externo')}' já está em uso."}), 409
+                 # Acessa o id_externo do dado que causou o erro para a mensagem
+                problematic_id = data.get('id_externo', 'desconhecido')
+                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
             return jsonify({"error": f"Erro ao atualizar B2C: {e}"}), 500
 
     if request.method == "DELETE":
@@ -217,11 +221,15 @@ def b2c_detail_api(id):
 
 # --- Execução do Aplicativo ---
 if __name__ == "__main__":
-    instance_path = os.path.join(basedir, 'instance')
+    instance_path = os.path.join(basedir, "instance")
     if not os.path.exists(instance_path):
         os.makedirs(instance_path)
     
     with app.app_context():
         db.create_all()
         
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
+
+
+
+
