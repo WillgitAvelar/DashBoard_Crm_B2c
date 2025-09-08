@@ -3,7 +3,7 @@ from flask import Flask, jsonify, render_template, request
 from datetime import datetime, date
 
 # Importa os modelos do arquivo models.py
-from models import db, Lead, B2C
+from models import db, Lead, B2C, MyResorts
 
 # --- Configuração Inicial ---
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -140,9 +140,71 @@ def b2c_api():
 
     return jsonify({"error": "Método não permitido"}), 405
 
+# ===================================================================
+#   ROTA DA API PARA MyResorts - COM FILTRO DE DATA E HOTEL
+# ===================================================================
+@app.route("/api/my_resorts", methods=["GET", "POST"])
+def my_resorts_api():
+    if request.method == "GET":
+        query = MyResorts.query
 
-# ... (O RESTO DAS SUAS ROTAS DE DETALHE /api/leads/<id> e /api/b2c/<id> CONTINUAM AQUI) ...
-# ... (E A SEÇÃO if __name__ == "__main__": TAMBÉM) ...
+        data_inicio_str = request.args.get("data_inicio")
+        data_fim_str = request.args.get("data_fim")
+        hotel_str = request.args.get("hotel")
+
+        if data_inicio_str:
+            try:
+                data_inicio = datetime.strptime(data_inicio_str, "%Y-%m-%d").date()
+                query = query.filter(MyResorts.data >= data_inicio)
+            except (ValueError, TypeError):
+                pass
+
+        if data_fim_str:
+            try:
+                data_fim = datetime.strptime(data_fim_str, "%Y-%m-%d").date()
+                query = query.filter(MyResorts.data <= data_fim)
+            except (ValueError, TypeError):
+                pass
+        
+        if hotel_str:
+            query = query.filter(MyResorts.nome_hotel.ilike(f"%{hotel_str}%"))
+
+        my_resorts_data = query.order_by(MyResorts.data.desc()).all()
+        return jsonify([item.to_dict() for item in my_resorts_data])
+
+    if request.method == "POST":
+        data = request.get_json()
+        try:
+            id_externo = data.get("id_externo")
+            if id_externo == "":
+                id_externo = None
+
+            if id_externo:
+                existing_item = MyResorts.query.filter_by(id_externo=id_externo).first()
+                if existing_item:
+                    return jsonify({"error": f"O ID Externo \'{id_externo}\' já está em uso."}), 409
+
+            new_my_resorts = MyResorts(
+                id_externo=id_externo,
+                data=datetime.strptime(data["data"], "%Y-%m-%d").date(),
+                nome_hotel=data.get("nome_hotel"),
+                valor=float(data.get("valor", 0)),
+                forma_pagamento=data.get("forma_pagamento"),
+                usou_cupom=data.get("usou_cupom", False),
+                status=data.get("status"),
+                status_pagamento=data.get("status_pagamento")
+            )
+            db.session.add(new_my_resorts)
+            db.session.commit()
+            return jsonify(new_my_resorts.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            if 'UNIQUE constraint failed' in str(e):
+                problematic_id = data.get('id_externo', 'desconhecido')
+                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
+            return jsonify({"error": f"Erro ao criar MyResorts: {e}"}), 500
+
+    return jsonify({"error": "Método não permitido"}), 405
 
 @app.route("/api/leads/<int:id>", methods=["GET", "PUT", "DELETE"])
 def lead_detail_api(id):
@@ -224,6 +286,50 @@ def b2c_detail_api(id):
             db.session.rollback()
             return jsonify({"error": f"Erro ao deletar B2C: {e}"}), 500
 
+@app.route("/api/my_resorts/<int:id>", methods=["GET", "PUT", "DELETE"])
+def my_resorts_detail_api(id):
+    my_resorts_item = MyResorts.query.get_or_404(id)
+
+    if request.method == "GET":
+        return jsonify(my_resorts_item.to_dict())
+
+    if request.method == "PUT":
+        data = request.get_json()
+        try:
+            id_externo = data.get("id_externo")
+            if id_externo == "":
+                id_externo = None
+
+            if id_externo:
+                existing_item = MyResorts.query.filter(MyResorts.id_externo == id_externo, MyResorts.id != id).first()
+                if existing_item:
+                    return jsonify({"error": f"O ID Externo \'{id_externo}\' já pertence a outro registro."}), 409
+
+            my_resorts_item.id_externo = id_externo
+            my_resorts_item.data = datetime.strptime(data["data"], "%Y-%m-%d").date()
+            my_resorts_item.nome_hotel = data.get("nome_hotel")
+            my_resorts_item.valor = float(data.get("valor", 0))
+            my_resorts_item.status = data.get("status")
+            my_resorts_item.status_pagamento = data.get("status_pagamento")
+            my_resorts_item.forma_pagamento = data.get("forma_pagamento")
+            my_resorts_item.usou_cupom = data.get("usou_cupom", False)
+            db.session.commit()
+            return jsonify(my_resorts_item.to_dict())
+        except Exception as e:
+            db.session.rollback()
+            if 'UNIQUE constraint failed' in str(e):
+                problematic_id = data.get('id_externo', 'desconhecido')
+                return jsonify({"error": f"O ID Externo '{problematic_id}' já está em uso."}), 409
+            return jsonify({"error": f"Erro ao atualizar MyResorts: {e}"}), 500
+
+    if request.method == "DELETE":
+        try:
+            db.session.delete(my_resorts_item)
+            db.session.commit()
+            return jsonify({"message": "Item MyResorts deletado com sucesso"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": f"Erro ao deletar MyResorts: {e}"}), 500
 
 # --- Execução do Aplicativo ---
 if __name__ == "__main__":
@@ -235,3 +341,4 @@ if __name__ == "__main__":
         db.create_all()
         
     app.run(debug=True, host="0.0.0.0", port=5000)
+
